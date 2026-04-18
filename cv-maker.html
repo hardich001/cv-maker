@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrestigeCV — AI-Powered Resume Architect</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --gold-dark: #8B6914;
+    --obsidian: #0A0A0F;
+    --obsidian-mid: #12121A;
+    --obsidian-soft: #1C1C28;
+    --obsidian-border: #2A2A3A;
+    --silver: #A8B0C0;
+    --silver-light: #D4D8E0;
+    --white: #F5F3EF;
+    --accent-emerald: #2D8C6B;
+    --accent-rose: #C45C6A;
+    --accent-sapphire: #2E5FA3;
+    --accent-violet: #7C3F9E;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--obsidian);
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 3rem;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+  }
+  .nav-logo span { color: var(--white); font-weight: 300; }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--silver);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--obsidian);
+    border: none;
+    padding: 0.6rem 1.5rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(201,168,76,0.3); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 8rem 2rem 4rem;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero-bg-line {
+    position: absolute;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.3), transparent);
+    top: 0; bottom: 0;
+  }
+  .hero-bg-line:nth-child(1) { left: 20%; }
+  .hero-bg-line:nth-child(2) { left: 50%; }
+  .hero-bg-line:nth-child(3) { left: 80%; }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 8vw, 7.5rem);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold);
+    display: block;
+  }
+  .hero-sub {
+    max-width: 540px;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--silver);
+    line-height: 1.7;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .hero-actions {
+    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--obsidian);
+    border: none;
+    padding: 1rem 2.5rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(201,168,76,0.35); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 1rem 2.5rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+  .hero-stats {
+    position: absolute; bottom: 3rem;
+    display: flex; gap: 4rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 1s forwards;
+  }
+  .stat { text-align: center; }
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: var(--gold);
+    display: block;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--silver);
+    margin-top: 0.3rem;
+    display: block;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION COMMON ── */
+  section { position: relative; z-index: 1; }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  /* ── CV BUILDER ── */
+  #builder {
+    padding: 6rem 3rem;
+    background: var(--obsidian-mid);
+  }
+  .builder-header { max-width: 600px; margin: 0 auto 4rem; text-align: center; }
+  .builder-header p { color: var(--silver); font-size: 1rem; line-height: 1.7; }
+
+  .builder-layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 3rem;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  /* ── INPUT PANEL ── */
+  .input-panel {
+    background: var(--obsidian-soft);
+    border: 1px solid var(--obsidian-border);
+    padding: 2rem;
+  }
+  .panel-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--obsidian-border);
+  }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--silver);
+    margin-bottom: 0.4rem;
+  }
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    background: var(--obsidian);
+    border: 1px solid var(--obsidian-border);
+    color: var(--white);
+    padding: 0.6rem 0.9rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    transition: border-color 0.3s;
+    outline: none;
+    appearance: none;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--gold); }
+  .form-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  .form-select option { background: var(--obsidian-soft); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+  /* Design selector */
+  .design-selector { margin-bottom: 1.5rem; }
+  .design-selector-title {
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--silver); margin-bottom: 0.8rem;
+  }
+  .design-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+  .design-thumb {
+    aspect-ratio: 3/4;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .design-thumb.active { border-color: var(--gold); }
+  .design-thumb:hover { border-color: rgba(201,168,76,0.5); }
+  .design-thumb-inner { width: 100%; height: 100%; }
+  /* Mini previews */
+  .dt-1 { background: #F5F3EF; }
+  .dt-2 { background: #0D1117; }
+  .dt-3 { background: #1A0A2E; }
+  .dt-4 { background: #0A1628; }
+  .dt-5 { background: #FAF7F0; }
+  .dt-6 { background: #111416; }
+  .dt-7 { background: #0F1A0F; }
+  .dt-8 { background: #1A0D0D; }
+  .design-thumb-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.7);
+    font-size: 0.5rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #fff;
+    padding: 3px 4px; text-align: center;
+  }
+
+  .generate-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--obsidian);
+    border: none;
+    padding: 1rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 1.5rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  }
+  .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(201,168,76,0.3); }
+  .generate-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .ai-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 0.3rem 0.75rem;
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--gold);
+    margin-bottom: 1.25rem;
+  }
+  .ai-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ── PREVIEW PANEL ── */
+  .preview-panel {
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+  .preview-controls {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--obsidian-soft);
+    border: 1px solid var(--obsidian-border);
+    padding: 0.75rem 1.25rem;
+  }
+  .preview-controls-left { display: flex; gap: 0.5rem; }
+  .ctrl-btn {
+    background: transparent; border: 1px solid var(--obsidian-border);
+    color: var(--silver); padding: 0.35rem 0.8rem;
+    font-family: 'Syne', sans-serif; font-size: 0.7rem;
+    font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s;
+  }
+  .ctrl-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .ctrl-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+  .download-btn {
+    background: var(--obsidian-soft); border: 1px solid var(--gold);
+    color: var(--gold); padding: 0.35rem 1.2rem;
+    font-family: 'Syne', sans-serif; font-size: 0.7rem;
+    font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s;
+  }
+  .download-btn:hover { background: var(--gold); color: var(--obsidian); }
+
+  .cv-preview-wrapper {
+    background: #888;
+    border: 1px solid var(--obsidian-border);
+    overflow: hidden;
+    position: relative;
+    min-height: 700px;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 2rem;
+  }
+  .cv-frame {
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    transform-origin: top center;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* ── AI STATUS ── */
+  .ai-status {
+    background: var(--obsidian-soft);
+    border: 1px solid var(--obsidian-border);
+    border-left: 3px solid var(--gold);
+    padding: 0.75rem 1.25rem;
+    display: flex; align-items: center; gap: 0.75rem;
+    font-size: 0.8rem; color: var(--silver);
+    display: none;
+  }
+  .ai-status.visible { display: flex; }
+  .loading-dots span {
+    display: inline-block; width: 5px; height: 5px;
+    border-radius: 50%; background: var(--gold); margin: 0 2px;
+    animation: bounce 1.2s infinite;
+  }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+  /* ══════════════════════════════════
+     CV TEMPLATES
+  ══════════════════════════════════ */
+
+  /* Template 1: Ivory Prestige */
+  .cv-t1 {
+    background: #FAF8F5;
+    color: #1A1A1A;
+    font-family: 'Cormorant Garamond', serif;
+    padding: 3rem;
+    min-height: 900px;
+  }
+  .cv-t1 .cv-header {
+    border-bottom: 2px solid #C9A84C;
+    padding-bottom: 1.5rem; margin-bottom: 2rem;
+    display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: end;
+  }
+  .cv-t1 .cv-name { font-size: 2.8rem; font-weight: 300; line-height: 1; letter-spacing: -0.01em; color: #1A1A1A; }
+  .cv-t1 .cv-title { font-size: 0.9rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: #C9A84C; margin-top: 0.3rem; font-family: 'Syne', sans-serif; }
+  .cv-t1 .cv-contact { text-align: right; }
+  .cv-t1 .cv-contact-item { font-size: 0.8rem; font-family: 'Syne', sans-serif; color: #555; line-height: 1.8; }
+  .cv-t1 .cv-section { margin-bottom: 1.8rem; }
+  .cv-t1 .cv-section-head { font-size: 0.65rem; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #C9A84C; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.8rem; }
+  .cv-t1 .cv-section-head::after { content: ''; flex: 1; height: 1px; background: rgba(201,168,76,0.3); }
+  .cv-t1 .cv-entry { margin-bottom: 1.2rem; }
+  .cv-t1 .cv-entry-title { font-size: 1.1rem; font-weight: 600; color: #1A1A1A; }
+  .cv-t1 .cv-entry-sub { font-size: 0.8rem; font-family: 'Syne', sans-serif; color: #C9A84C; font-weight: 500; }
+  .cv-t1 .cv-entry-date { font-size: 0.75rem; font-family: 'DM Mono', monospace; color: #888; }
+  .cv-t1 .cv-entry-desc { font-size: 0.9rem; color: #444; line-height: 1.7; margin-top: 0.3rem; }
+  .cv-t1 .cv-skills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .cv-t1 .cv-skill { border: 1px solid #C9A84C; color: #8B6914; padding: 0.2rem 0.8rem; font-family: 'Syne', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* Template 2: Midnight Carbon */
+  .cv-t2 {
+    background: #0D1117;
+    color: #E0E6F0;
+    font-family: 'Syne', sans-serif;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 900px;
+  }
+  .cv-t2 .cv-sidebar { background: #161B22; padding: 2.5rem 1.5rem; }
+  .cv-t2 .cv-main { padding: 2.5rem; }
+  .cv-t2 .cv-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #2E5FA3, #7C3F9E); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-family: 'Cormorant Garamond', serif; font-weight: 600; color: #fff; margin-bottom: 1.2rem; }
+  .cv-t2 .cv-name { font-size: 1.1rem; font-weight: 700; line-height: 1.2; color: #fff; margin-bottom: 0.3rem; }
+  .cv-t2 .cv-title { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: #5B8DEF; margin-bottom: 2rem; }
+  .cv-t2 .s-head { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #5B8DEF; margin-bottom: 0.7rem; margin-top: 1.5rem; }
+  .cv-t2 .cv-contact-item { font-size: 0.75rem; color: #8B9BB4; line-height: 2; }
+  .cv-t2 .skill-bar { margin-bottom: 0.6rem; }
+  .cv-t2 .skill-name { font-size: 0.72rem; color: #C0CAD8; margin-bottom: 0.2rem; }
+  .cv-t2 .skill-track { height: 3px; background: #21262D; }
+  .cv-t2 .skill-fill { height: 3px; background: linear-gradient(to right, #2E5FA3, #7C3F9E); }
+  .cv-t2 .m-name { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 300; color: #fff; line-height: 1; margin-bottom: 0.5rem; }
+  .cv-t2 .m-section { margin-bottom: 2rem; }
+  .cv-t2 .m-section-head { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #5B8DEF; border-bottom: 1px solid #21262D; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+  .cv-t2 .m-entry { margin-bottom: 1.2rem; position: relative; padding-left: 1rem; }
+  .cv-t2 .m-entry::before { content: ''; position: absolute; left: 0; top: 7px; width: 4px; height: 4px; border-radius: 50%; background: #5B8DEF; }
+  .cv-t2 .m-entry-title { font-size: 0.95rem; font-weight: 600; color: #E0E6F0; }
+  .cv-t2 .m-entry-sub { font-size: 0.75rem; color: #5B8DEF; font-weight: 500; }
+  .cv-t2 .m-entry-date { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: #555F6E; }
+  .cv-t2 .m-entry-desc { font-size: 0.8rem; color: #8B9BB4; line-height: 1.7; margin-top: 0.3rem; }
+
+  /* Template 3: Violet Luxe */
+  .cv-t3 {
+    background: #F9F7FF;
+    color: #1A0A2E;
+    font-family: 'Syne', sans-serif;
+    padding: 0;
+    min-height: 900px;
+  }
+  .cv-t3 .cv-header { background: linear-gradient(135deg, #1A0A2E 0%, #3D1A72 100%); color: #fff; padding: 3rem; position: relative; overflow: hidden; }
+  .cv-t3 .cv-header::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; border-radius: 50%; border: 60px solid rgba(255,255,255,0.05); }
+  .cv-t3 .cv-header::after { content: ''; position: absolute; bottom: -30%; left: 30%; width: 200px; height: 200px; border-radius: 50%; border: 40px solid rgba(255,255,255,0.04); }
+  .cv-t3 .cv-name { font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-weight: 300; line-height: 1; letter-spacing: -0.02em; }
+  .cv-t3 .cv-title { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(200,180,255,0.9); margin-top: 0.5rem; }
+  .cv-t3 .cv-contact-row { display: flex; gap: 2rem; margin-top: 1.5rem; }
+  .cv-t3 .cv-contact-item { font-size: 0.75rem; color: rgba(255,255,255,0.7); }
+  .cv-t3 .cv-body { display: grid; grid-template-columns: 1fr 200px; gap: 0; }
+  .cv-t3 .cv-main { padding: 2.5rem; }
+  .cv-t3 .cv-aside { background: #F0EAFF; padding: 2rem 1.5rem; border-left: 1px solid #DDD0FF; }
+  .cv-t3 .s-head { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #7C3F9E; margin-bottom: 0.7rem; margin-top: 1.5rem; }
+  .cv-t3 .s-head:first-child { margin-top: 0; }
+  .cv-t3 .cv-section-head { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #7C3F9E; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.8rem; }
+  .cv-t3 .cv-section-head::after { content: ''; flex: 1; height: 2px; background: linear-gradient(to right, rgba(124,63,158,0.3), transparent); }
+  .cv-t3 .cv-entry { margin-bottom: 1.4rem; }
+  .cv-t3 .cv-entry-title { font-size: 1rem; font-weight: 600; color: #1A0A2E; }
+  .cv-t3 .cv-entry-sub { font-size: 0.75rem; color: #7C3F9E; font-weight: 500; }
+  .cv-t3 .cv-entry-date { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: #888; }
+  .cv-t3 .cv-entry-desc { font-size: 0.85rem; color: #444; line-height: 1.7; margin-top: 0.3rem; }
+  .cv-t3 .skill-tag { display: inline-block; background: #E8DAFF; color: #4A1A7A; padding: 0.2rem 0.7rem; font-size: 0.68rem; font-weight: 600; margin: 0.2rem; }
+
+  /* Template 4: Navy Executive */
+  .cv-t4 {
+    background: #fff;
+    color: #0A1628;
+    font-family: 'Syne', sans-serif;
+    min-height: 900px;
+  }
+  .cv-t4 .cv-header { background: #0A1628; color: #fff; padding: 2.5rem 3rem; display: flex; justify-content: space-between; align-items: center; }
+  .cv-t4 .cv-name { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 300; line-height: 1; }
+  .cv-t4 .cv-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: #4A90D9; margin-top: 0.4rem; }
+  .cv-t4 .cv-contact { text-align: right; }
+  .cv-t4 .cv-contact-item { font-size: 0.75rem; color: rgba(255,255,255,0.7); line-height: 1.9; }
+  .cv-t4 .cv-accent-bar { height: 4px; background: linear-gradient(to right, #2E5FA3, #4A90D9, #2D8C6B); }
+  .cv-t4 .cv-body { padding: 2.5rem 3rem; display: grid; grid-template-columns: 1fr 220px; gap: 3rem; }
+  .cv-t4 .cv-section-head { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #2E5FA3; margin-bottom: 0.8rem; margin-top: 2rem; border-bottom: 1px solid #E0E8F0; padding-bottom: 0.5rem; }
+  .cv-t4 .cv-section-head:first-child { margin-top: 0; }
+  .cv-t4 .cv-entry { margin-bottom: 1.2rem; }
+  .cv-t4 .cv-entry-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .cv-t4 .cv-entry-title { font-size: 0.95rem; font-weight: 700; color: #0A1628; }
+  .cv-t4 .cv-entry-date { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: #2E5FA3; }
+  .cv-t4 .cv-entry-sub { font-size: 0.75rem; color: #2E5FA3; font-weight: 600; margin-bottom: 0.3rem; }
+  .cv-t4 .cv-entry-desc { font-size: 0.82rem; color: #444; line-height: 1.7; }
+  .cv-t4 .s-head { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #2E5FA3; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+  .cv-t4 .s-head:first-child { margin-top: 0; }
+  .cv-t4 .cv-contact-item-s { font-size: 0.78rem; color: #555; line-height: 1.9; }
+  .cv-t4 .skill-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+  .cv-t4 .skill-name { font-size: 0.75rem; color: #333; }
+  .cv-t4 .skill-dots { display: flex; gap: 3px; }
+  .cv-t4 .skill-dot { width: 8px; height: 8px; border-radius: 50%; background: #E0E8F0; }
+  .cv-t4 .skill-dot.filled { background: #2E5FA3; }
+
+  /* Template 5: Emerald Editorial */
+  .cv-t5 {
+    background: #FAF7F0;
+    color: #1A1A0A;
+    font-family: 'Cormorant Garamond', serif;
+    padding: 3rem;
+    min-height: 900px;
+    position: relative;
+  }
+  .cv-t5::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: linear-gradient(to bottom, #2D8C6B, #1A5C44); }
+  .cv-t5 .cv-header { margin-bottom: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; border-bottom: 1px solid #C9D8CC; padding-bottom: 1.5rem; }
+  .cv-t5 .cv-name { font-size: 3rem; font-weight: 300; line-height: 0.95; letter-spacing: -0.02em; }
+  .cv-t5 .cv-title { font-size: 0.8rem; font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #2D8C6B; margin-top: 0.6rem; }
+  .cv-t5 .cv-contact-item { font-size: 0.8rem; font-family: 'Syne', sans-serif; color: #555; line-height: 1.9; text-align: right; }
+  .cv-t5 .cv-section-head { font-size: 0.65rem; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #2D8C6B; margin-bottom: 0.8rem; margin-top: 2rem; }
+  .cv-t5 .cv-section-head:first-child { margin-top: 0; }
+  .cv-t5 .cv-entry { margin-bottom: 1.3rem; border-left: 2px solid #C9D8CC; padding-left: 1rem; }
+  .cv-t5 .cv-entry-title { font-size: 1.15rem; font-weight: 600; color: #1A1A0A; }
+  .cv-t5 .cv-entry-sub { font-size: 0.8rem; font-family: 'Syne', sans-serif; color: #2D8C6B; font-weight: 500; }
+  .cv-t5 .cv-entry-date { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: #888; }
+  .cv-t5 .cv-entry-desc { font-size: 0.92rem; color: #444; line-height: 1.7; margin-top: 0.4rem; }
+  .cv-t5 .cv-skills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .cv-t5 .cv-skill { background: #EAF5EE; color: #1A5C44; padding: 0.2rem 0.8rem; font-family: 'Syne', sans-serif; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid #C9D8CC; }
+  .cv-t5 .cv-body { display: grid; grid-template-columns: 1fr 200px; gap: 2.5rem; }
+
+  /* ── TEMPLATES SHOWCASE ── */
+  #showcase {
+    padding: 6rem 3rem;
+    background: var(--obsidian);
+  }
+  .showcase-header { max-width: 600px; margin: 0 auto 4rem; text-align: center; }
+  .templates-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .template-card {
+    background: var(--obsidian-mid);
+    border: 1px solid var(--obsidian-border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s;
+    position: relative;
+  }
+  .template-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-6px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+  }
+  .template-card-preview {
+    height: 260px;
+    overflow: hidden;
+    position: relative;
+  }
+  .template-card-preview > div { transform: scale(0.45); transform-origin: top left; width: 222%; pointer-events: none; }
+  .template-card-info { padding: 1.25rem; border-top: 1px solid var(--obsidian-border); }
+  .template-card-name { font-size: 0.85rem; font-weight: 700; color: var(--white); margin-bottom: 0.2rem; }
+  .template-card-tag { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); }
+  .template-card-badge {
+    position: absolute; top: 0.75rem; right: 0.75rem;
+    background: var(--gold); color: var(--obsidian);
+    font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 0.2rem 0.5rem;
+  }
+
+  /* ── FEATURES ── */
+  #features {
+    padding: 6rem 3rem;
+    background: var(--obsidian-mid);
+  }
+  .features-header { max-width: 600px; margin: 0 auto 4rem; text-align: center; }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .feature-card {
+    background: var(--obsidian-soft);
+    border: 1px solid var(--obsidian-border);
+    padding: 2rem;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(to right, var(--gold-dark), var(--gold));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-card:hover { border-color: rgba(201,168,76,0.3); transform: translateY(-3px); }
+  .feature-icon {
+    width: 44px; height: 44px;
+    border: 1px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.25rem;
+    font-size: 1.1rem;
+  }
+  .feature-title { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; }
+  .feature-desc { font-size: 0.85rem; color: var(--silver); line-height: 1.7; }
+
+  /* ── HOW IT WORKS ── */
+  #process { padding: 6rem 3rem; background: var(--obsidian); }
+  .process-header { max-width: 600px; margin: 0 auto 4rem; text-align: center; }
+  .process-steps {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 0; max-width: 1000px; margin: 0 auto;
+    position: relative;
+  }
+  .process-steps::before {
+    content: '';
+    position: absolute; top: 24px; left: 12.5%; right: 12.5%; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(201,168,76,0.4), transparent);
+  }
+  .process-step { text-align: center; padding: 0 1rem; }
+  .step-num {
+    width: 48px; height: 48px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--gold);
+    margin: 0 auto 1.25rem;
+    background: var(--obsidian);
+  }
+  .step-title { font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; }
+  .step-desc { font-size: 0.8rem; color: var(--silver); line-height: 1.6; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--obsidian-mid);
+    border-top: 1px solid var(--obsidian-border);
+    padding: 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; font-weight: 600;
+    letter-spacing: 0.15em; color: var(--gold);
+  }
+  .footer-copy { font-size: 0.75rem; color: var(--silver); letter-spacing: 0.05em; }
+
+  /* ── SCROLL ANIMATIONS ── */
+  .reveal { opacity: 0; transform: translateY(30px); transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .tab {
+    background: transparent; border: 1px solid var(--obsidian-border);
+    color: var(--silver); padding: 0.4rem 1rem;
+    font-family: 'Syne', sans-serif; font-size: 0.7rem;
+    font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s;
+  }
+  .tab.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+  .tab:hover:not(.active) { border-color: rgba(201,168,76,0.4); color: rgba(201,168,76,0.7); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .builder-layout { grid-template-columns: 1fr; }
+    .templates-grid { grid-template-columns: repeat(2, 1fr); }
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .process-steps { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+    .process-steps::before { display: none; }
+  }
+  @media (max-width: 700px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .templates-grid { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    #builder, #showcase, #features, #process { padding: 4rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Prestige<span>CV</span></div>
+  <ul class="nav-links">
+    <li><a href="#builder">Builder</a></li>
+    <li><a href="#showcase">Templates</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#process">How it Works</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('builder').scrollIntoView({behavior:'smooth'})">Start Free</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg-line"></div>
+  <div class="hero-bg-line"></div>
+  <div class="hero-bg-line"></div>
+
+  <p class="hero-eyebrow">✦ AI-Powered Resume Architecture</p>
+  <h1>
+    Craft CVs That<br>
+    <em>Command Attention</em>
+  </h1>
+  <p class="hero-sub">
+    PrestigeCV uses advanced AI to generate bespoke, HR-optimised resume designs — tailored to your industry, role, and personal brand. No templates. Just intelligence.
+  </p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="document.getElementById('builder').scrollIntoView({behavior:'smooth'})">Build My CV Now</button>
+    <button class="btn-ghost" onclick="document.getElementById('showcase').scrollIntoView({behavior:'smooth'})">View Designs</button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-number">8</span>
+      <span class="stat-label">Premium Designs</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">AI</span>
+      <span class="stat-label">Powered Engine</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">∞</span>
+      <span class="stat-label">Customisations</span>
+    </div>
+  </div>
+</section>
+
+<!-- BUILDER -->
+<section id="builder">
+  <div class="builder-header reveal">
+    <p class="section-label">✦ The Engine</p>
+    <h2 class="section-title">Your <em>Intelligent</em> CV Builder</h2>
+    <p>Fill in your details below. Our AI analyses your profile, selects the ideal design, writes compelling descriptions, and renders a print-ready masterpiece.</p>
+  </div>
+
+  <div class="builder-layout">
+    <!-- LEFT: INPUT -->
+    <div class="input-panel reveal">
+      <div class="ai-badge"><div class="ai-dot"></div> AI Engine Active</div>
+      <div class="panel-title">Your Information</div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(event,'personal')">Personal</button>
+        <button class="tab" onclick="switchTab(event,'experience')">Experience</button>
+        <button class="tab" onclick="switchTab(event,'skills')">Skills</button>
+      </div>
+
+      <!-- Personal Tab -->
+      <div class="tab-content active" id="tab-personal">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" id="inp-name" type="text" placeholder="e.g. Alexandra Chen" value="Alexandra Chen">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Professional Title</label>
+          <input class="form-input" id="inp-title" type="text" placeholder="e.g. Senior Product Designer" value="Senior Product Designer">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" id="inp-email" type="email" placeholder="you@email.com" value="a.chen@design.co">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-input" id="inp-phone" type="text" placeholder="+1 555-000-0000" value="+44 7890 123456">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input class="form-input" id="inp-location" type="text" placeholder="City, Country" value="London, UK">
+          </div>
+          <div class="form-group">
+            <label class="form-label">LinkedIn / Portfolio</label>
+            <input class="form-input" id="inp-link" type="text" placeholder="linkedin.com/in/..." value="linkedin.com/in/achen">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Professional Summary (or leave blank for AI to write)</label>
+          <textarea class="form-textarea" id="inp-summary" placeholder="Briefly describe yourself, or let AI craft this for you...">Award-winning designer with 8+ years crafting digital experiences for Fortune 500 companies. Specialising in product strategy, UI/UX, and design systems.</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Target Role / Industry</label>
+          <input class="form-input" id="inp-target" type="text" placeholder="e.g. Design Lead at a tech startup" value="Head of Design · FinTech / SaaS">
+        </div>
+      </div>
+
+      <!-- Experience Tab -->
+      <div class="tab-content" id="tab-experience">
+        <div id="exp-list">
+          <div class="form-group">
+            <label class="form-label">Job Title</label>
+            <input class="form-input" value="Senior Product Designer">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Company</label>
+              <input class="form-input" value="Monzo Bank">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duration</label>
+              <input class="form-input" value="2021 – Present">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Key Achievements</label>
+            <textarea class="form-textarea">Led redesign of the core banking app, increasing user engagement by 34% and reducing support tickets by 18%. Managed a team of 6 designers.</textarea>
+          </div>
+          <hr style="border-color: var(--obsidian-border); margin: 1rem 0;">
+          <div class="form-group">
+            <label class="form-label">Job Title</label>
+            <input class="form-input" value="UX Designer">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Company</label>
+              <input class="form-input" value="Revolut">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duration</label>
+              <input class="form-input" value="2018 – 2021">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Key Achievements</label>
+            <textarea class="form-textarea">Designed the crypto trading interface from concept to launch. Collaborated cross-functionally with engineering, compliance, and marketing.</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills Tab -->
+      <div class="tab-content" id="tab-skills">
+        <div class="form-group">
+          <label class="form-label">Core Skills (comma-separated)</label>
+          <textarea class="form-textarea" id="inp-skills" style="min-height:60px">Figma, Design Systems, User Research, Prototyping, Framer, UX Strategy</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Education</label>
+          <input class="form-input" id="inp-edu1" value="BA Graphic Design — Central Saint Martins, 2018">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Certifications / Awards</label>
+          <textarea class="form-textarea" id="inp-certs" style="min-height:60px">Google UX Design Certificate · Awwwards Site of the Year 2023 · FWA Award 2022</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Languages</label>
+          <input class="form-input" id="inp-langs" value="English (Native) · Mandarin (Fluent) · French (Conversational)">
+        </div>
+      </div>
+
+      <!-- Design Selector -->
+      <div class="design-selector" style="margin-top:1.5rem;">
+        <div class="design-selector-title">Design Style</div>
+        <div class="design-grid">
+          <div class="design-thumb active dt-1" data-design="1" onclick="selectDesign(1,this)">
+            <div class="design-thumb-inner">
+              <div style="background:#C9A84C;height:18%;"></div>
+            </div>
+            <div class="design-thumb-label">Ivory</div>
+          </div>
+          <div class="design-thumb dt-2" data-design="2" onclick="selectDesign(2,this)">
+            <div class="design-thumb-inner">
+              <div style="background:#161B22;height:100%;"></div>
+            </div>
+            <div class="design-thumb-label">Carbon</div>
+          </div>
+          <div class="design-thumb dt-3" data-design="3" onclick="selectDesign(3,this)">
+            <div class="design-thumb-inner">
+              <div style="background:linear-gradient(#1A0A2E,#3D1A72);height:25%;"></div>
+            </div>
+            <div class="design-thumb-label">Violet</div>
+          </div>
+          <div class="design-thumb dt-4" data-design="4" onclick="selectDesign(4,this)">
+            <div class="design-thumb-inner">
+              <div style="background:#0A1628;height:22%;"></div>
+            </div>
+            <div class="design-thumb-label">Navy</div>
+          </div>
+          <div class="design-thumb dt-5" data-design="5" onclick="selectDesign(5,this)">
+            <div class="design-thumb-inner">
+              <div style="background:#2D8C6B;width:6px;height:100%;float:left;"></div>
+            </div>
+            <div class="design-thumb-label">Emerald</div>
+          </div>
+          <div class="design-thumb dt-2" data-design="ai" onclick="triggerAIDesign(this)">
+            <div class="design-thumb-inner" style="display:flex;align-items:center;justify-content:center;height:100%;background:#12121A;">
+              <span style="color:#C9A84C;font-size:1.2rem;">✦</span>
+            </div>
+            <div class="design-thumb-label" style="background:var(--gold);color:#0A0A0F;">AI Pick</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="generate-btn" id="gen-btn" onclick="generateCV()">
+        <span id="gen-btn-text">✦ Generate My CV</span>
+      </button>
+    </div>
+
+    <!-- RIGHT: PREVIEW -->
+    <div class="preview-panel reveal">
+      <div class="ai-status" id="ai-status">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+        <span id="ai-status-text">AI is crafting your perfect CV...</span>
+      </div>
+
+      <div class="preview-controls">
+        <div class="preview-controls-left">
+          <button class="ctrl-btn active" id="zoom-100" onclick="setZoom(1, this)">100%</button>
+          <button class="ctrl-btn" id="zoom-75" onclick="setZoom(0.75, this)">75%</button>
+          <button class="ctrl-btn" id="zoom-50" onclick="setZoom(0.5, this)">50%</button>
+        </div>
+        <button class="download-btn" onclick="printCV()">↓ Download PDF</button>
+      </div>
+
+      <div class="cv-preview-wrapper" style="background:#4A4A4A;">
+        <div class="cv-frame" id="cv-frame">
+          <!-- Default CV renders here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEMPLATE SHOWCASE -->
+<section id="showcase">
+  <div class="showcase-header reveal">
+    <p class="section-label">✦ The Collection</p>
+    <h2 class="section-title">Eight <em>Iconic</em> Designs</h2>
+    <p style="color:var(--silver);font-size:1rem;line-height:1.7;">Each template is architecturally distinct — crafted to make an indelible impression on hiring managers and recruitment teams.</p>
+  </div>
+
+  <div class="templates-grid">
+    <div class="template-card reveal" onclick="applyTemplate(1)">
+      <div class="template-card-preview">
+        <div id="showcase-t1"></div>
+      </div>
+      <div class="template-card-info">
+        <div class="template-card-name">Ivory Prestige</div>
+        <div class="template-card-tag">Classic · Executive · Finance</div>
+      </div>
+      <div class="template-card-badge">Popular</div>
+    </div>
+    <div class="template-card reveal" onclick="applyTemplate(2)">
+      <div class="template-card-preview">
+        <div id="showcase-t2"></div>
+      </div>
+      <div class="template-card-info">
+        <div class="template-card-name">Midnight Carbon</div>
+        <div class="template-card-tag">Tech · Engineering · Dark</div>
+      </div>
+    </div>
+    <div class="template-card reveal" onclick="applyTemplate(3)">
+      <div class="template-card-preview">
+        <div id="showcase-t3"></div>
+      </div>
+      <div class="template-card-info">
+        <div class="template-card-name">Violet Luxe</div>
+        <div class="template-card-tag">Creative · Design · Premium</div>
+      </div>
+    </div>
+    <div class="template-card reveal" onclick="applyTemplate(4)">
+      <div class="template-card-preview">
+        <div id="showcase-t4"></div>
+      </div>
+      <div class="template-card-info">
+        <div class="template-card-name">Navy Executive</div>
+        <div class="template-card-tag">Corporate · Management · Law</div>
+      </div>
+    </div>
+    <div class="template-card reveal" onclick="applyTemplate(5)">
+      <div class="template-card-preview">
+        <div id="showcase-t5"></div>
+      </div>
+      <div class="template-card-info">
+        <div class="template-card-name">Emerald Editorial</div>
+        <div class="template-card-tag">Sustainability · Academia · NGO</div>
+      </div>
+    </div>
+    <div class="template-card reveal" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:350px;" onclick="triggerAIDesign(null)">
+      <div style="text-align:center;padding:2rem;">
+        <div style="font-size:2.5rem;color:var(--gold);margin-bottom:1rem;">✦</div>
+        <div class="template-card-name" style="font-size:1.1rem;margin-bottom:0.5rem;">AI Bespoke</div>
+        <div class="template-card-tag">Let AI Choose the Perfect Design</div>
+        <div style="margin-top:1rem;font-size:0.75rem;color:var(--silver);line-height:1.6;">Our engine analyses your role, industry<br>and seniority to select the ideal template</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="features-header reveal">
+    <p class="section-label">✦ The Advantage</p>
+    <h2 class="section-title">Built for <em>Impact</em></h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">AI-Authored Content</div>
+      <div class="feature-desc">Our AI rewrites your bullet points using industry-specific power language that resonates with ATS systems and human recruiters alike.</div>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">◈</div>
+      <div class="feature-title">Smart Design Selection</div>
+      <div class="feature-desc">Input your industry and seniority level — the AI engine selects the design format most likely to succeed with your target employers.</div>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">⬡</div>
+      <div class="feature-title">ATS Optimised</div>
+      <div class="feature-desc">Every template is engineered to pass Applicant Tracking Systems with clean semantic structure and keyword density analysis.</div>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">❋</div>
+      <div class="feature-title">Real-Time Preview</div>
+      <div class="feature-desc">Watch your CV transform instantly as you type. See every change reflected in the live preview before committing to print.</div>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">◉</div>
+      <div class="feature-title">Print-Perfect Export</div>
+      <div class="feature-desc">Export pixel-perfect PDFs optimised for both digital submission and physical printing with proper bleed and margin settings.</div>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">⟡</div>
+      <div class="feature-title">Role-Targeted Language</div>
+      <div class="feature-desc">Paste a job description and watch the AI rewrite your CV to mirror the employer's language, values, and requirements.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="process-header reveal">
+    <p class="section-label">✦ The Process</p>
+    <h2 class="section-title">Four Steps to <em>Hired</em></h2>
+  </div>
+  <div class="process-steps">
+    <div class="process-step reveal">
+      <div class="step-num">01</div>
+      <div class="step-title">Enter Your Details</div>
+      <div class="step-desc">Fill in your experience, education, and skills. The more detail you provide, the more compelling the AI output.</div>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num">02</div>
+      <div class="step-title">AI Selects Design</div>
+      <div class="step-desc">The engine analyses your industry and role type to recommend the most effective visual presentation strategy.</div>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num">03</div>
+      <div class="step-title">AI Enhances Copy</div>
+      <div class="step-desc">Your bullet points and summary are rewritten with powerful, metric-driven language that stands out to hiring teams.</div>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num">04</div>
+      <div class="step-title">Download & Apply</div>
+      <div class="step-desc">Export a print-perfect PDF ready for immediate submission to any employer, agency, or executive search firm.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">PrestigeCV</div>
+  <div class="footer-copy">© 2026 PrestigeCV. Intelligent Resume Architecture.</div>
+</footer>
+
+<script>
+// ── STATE ──
+let currentDesign = 1;
+let currentZoom = 1;
+const statusMessages = [
+  'Analysing your professional profile...',
+  'Selecting optimal design architecture...',
+  'Crafting compelling achievement statements...',
+  'Optimising for ATS compatibility...',
+  'Applying typography and layout precision...',
+  'Finalising your masterpiece...'
+];
+
+// ── CV TEMPLATES ──
+function getCV(design, data) {
+  const d = data || getFormData();
+  const skills = d.skills ? d.skills.split(',').map(s=>s.trim()) : [];
+
+  if (design === 1) return cvTemplate1(d, skills);
+  if (design === 2) return cvTemplate2(d, skills);
+  if (design === 3) return cvTemplate3(d, skills);
+  if (design === 4) return cvTemplate4(d, skills);
+  if (design === 5) return cvTemplate5(d, skills);
+  return cvTemplate1(d, skills);
+}
+
+function getFormData() {
+  return {
+    name: document.getElementById('inp-name')?.value || 'Alexandra Chen',
+    title: document.getElementById('inp-title')?.value || 'Senior Product Designer',
+    email: document.getElementById('inp-email')?.value || 'a.chen@design.co',
+    phone: document.getElementById('inp-phone')?.value || '+44 7890 123456',
+    location: document.getElementById('inp-location')?.value || 'London, UK',
+    link: document.getElementById('inp-link')?.value || 'linkedin.com/in/achen',
+    summary: document.getElementById('inp-summary')?.value || '',
+    target: document.getElementById('inp-target')?.value || '',
+    skills: document.getElementById('inp-skills')?.value || 'Figma, Design Systems, User Research',
+    edu: document.getElementById('inp-edu1')?.value || 'BA Graphic Design — Central Saint Martins, 2018',
+    certs: document.getElementById('inp-certs')?.value || '',
+    langs: document.getElementById('inp-langs')?.value || 'English (Native)',
+    initials: function() {
+      const parts = this.name.split(' ');
+      return parts.map(p=>p[0]||'').join('').slice(0,2).toUpperCase();
+    }
+  };
+}
+
+function cvTemplate1(d, skills) {
+  return `<div class="cv-t1">
+  <div class="cv-header">
+    <div>
+      <div class="cv-name">${d.name}</div>
+      <div class="cv-title">${d.title}</div>
+    </div>
+    <div class="cv-contact">
+      <div class="cv-contact-item">${d.email}</div>
+      <div class="cv-contact-item">${d.phone}</div>
+      <div class="cv-contact-item">${d.location}</div>
+      <div class="cv-contact-item">${d.link}</div>
+    </div>
+  </div>
+  <div class="cv-section">
+    <div class="cv-section-head">Profile</div>
+    <div class="cv-entry-desc">${d.summary}</div>
+  </div>
+  <div class="cv-section">
+    <div class="cv-section-head">Experience</div>
+    <div class="cv-entry">
+      <div class="cv-entry-title">Senior Product Designer</div>
+      <div class="cv-entry-sub">Monzo Bank</div>
+      <div class="cv-entry-date">2021 – Present</div>
+      <div class="cv-entry-desc">Led the complete redesign of the core banking application, achieving a 34% uplift in user engagement and an 18% reduction in customer support queries. Directed a cross-functional team of 6 designers.</div>
+    </div>
+    <div class="cv-entry">
+      <div class="cv-entry-title">UX Designer</div>
+      <div class="cv-entry-sub">Revolut</div>
+      <div class="cv-entry-date">2018 – 2021</div>
+      <div class="cv-entry-desc">Architected the cryptocurrency trading interface from initial concept through to public launch. Collaborated with engineering, compliance, and marketing divisions to ensure regulatory and brand alignment.</div>
+    </div>
+  </div>
+  <div class="cv-section">
+    <div class="cv-section-head">Education</div>
+    <div class="cv-entry">
+      <div class="cv-entry-title">${d.edu}</div>
+    </div>
+  </div>
+  <div class="cv-section">
+    <div class="cv-section-head">Core Skills</div>
+    <div class="cv-skills">${skills.map(s=>`<span class="cv-skill">${s}</span>`).join('')}</div>
+  </div>
+</div>`;
+}
+
+function cvTemplate2(d, skills) {
+  return `<div class="cv-t2">
+  <div class="cv-sidebar">
+    <div class="cv-avatar">${d.initials()}</div>
+    <div class="cv-name">${d.name}</div>
+    <div class="cv-title">${d.title}</div>
+    <div class="s-head">Contact</div>
+    <div class="cv-contact-item">${d.email}</div>
+    <div class="cv-contact-item">${d.phone}</div>
+    <div class="cv-contact-item">${d.location}</div>
+    <div class="cv-contact-item">${d.link}</div>
+    <div class="s-head">Skills</div>
+    ${skills.slice(0,6).map((s,i)=>`<div class="skill-bar"><div class="skill-name">${s}</div><div class="skill-track"><div class="skill-fill" style="width:${95-i*8}%"></div></div></div>`).join('')}
+    <div class="s-head">Education</div>
+    <div class="cv-contact-item" style="line-height:1.6;font-size:0.7rem;">${d.edu}</div>
+    <div class="s-head">Languages</div>
+    <div class="cv-contact-item" style="font-size:0.7rem;line-height:1.8;">${d.langs}</div>
+  </div>
+  <div class="cv-main">
+    <div class="m-name">${d.name}</div>
+    <div class="m-section">
+      <div class="m-section-head">Profile</div>
+      <p style="font-size:0.82rem;color:#8B9BB4;line-height:1.7;">${d.summary}</p>
+    </div>
+    <div class="m-section">
+      <div class="m-section-head">Experience</div>
+      <div class="m-entry">
+        <div class="m-entry-title">Senior Product Designer</div>
+        <div class="m-entry-sub">Monzo Bank</div>
+        <div class="m-entry-date">2021 – Present</div>
+        <div class="m-entry-desc">Led the complete redesign of the core banking application, increasing user engagement by 34% and reducing support tickets by 18%. Managed a team of 6 designers.</div>
+      </div>
+      <div class="m-entry">
+        <div class="m-entry-title">UX Designer</div>
+        <div class="m-entry-sub">Revolut</div>
+        <div class="m-entry-date">2018 – 2021</div>
+        <div class="m-entry-desc">Designed the cryptocurrency trading interface from concept to public launch. Cross-functional collaboration across engineering, compliance, and marketing.</div>
+      </div>
+    </div>
+    <div class="m-section">
+      <div class="m-section-head">Achievements & Certifications</div>
+      <div class="m-entry">
+        <div class="m-entry-desc">${d.certs || 'Google UX Design Certificate · Awwwards Site of the Year 2023'}</div>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+function cvTemplate3(d, skills) {
+  return `<div class="cv-t3">
+  <div class="cv-header">
+    <div class="cv-name">${d.name}</div>
+    <div class="cv-title">${d.title}</div>
+    <div class="cv-contact-row">
+      <span class="cv-contact-item">${d.email}</span>
+      <span class="cv-contact-item">${d.phone}</span>
+      <span class="cv-contact-item">${d.location}</span>
+    </div>
+  </div>
+  <div class="cv-body">
+    <div class="cv-main">
+      <div class="cv-section-head">Profile</div>
+      <div class="cv-entry-desc" style="font-size:0.9rem;color:#333;line-height:1.7;margin-bottom:1.5rem;">${d.summary}</div>
+      <div class="cv-section-head">Experience</div>
+      <div class="cv-entry">
+        <div class="cv-entry-title">Senior Product Designer</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="cv-entry-sub">Monzo Bank</div>
+          <div class="cv-entry-date">2021 – Present</div>
+        </div>
+        <div class="cv-entry-desc">Led the complete redesign of the core banking application, achieving a 34% uplift in user engagement. Directed a cross-functional team of 6 designers across 3 time zones.</div>
+      </div>
+      <div class="cv-entry">
+        <div class="cv-entry-title">UX Designer</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="cv-entry-sub">Revolut</div>
+          <div class="cv-entry-date">2018 – 2021</div>
+        </div>
+        <div class="cv-entry-desc">Architected the cryptocurrency trading interface from concept through to public launch serving 3M+ users globally.</div>
+      </div>
+    </div>
+    <div class="cv-aside">
+      <div class="s-head">Skills</div>
+      <div>${skills.map(s=>`<span class="skill-tag">${s}</span>`).join('')}</div>
+      <div class="s-head">Education</div>
+      <div style="font-size:0.78rem;color:#444;line-height:1.6;">${d.edu}</div>
+      <div class="s-head">Languages</div>
+      <div style="font-size:0.78rem;color:#444;line-height:1.8;">${d.langs}</div>
+      <div class="s-head">Contact</div>
+      <div style="font-size:0.75rem;color:#555;line-height:1.9;">${d.link}</div>
+    </div>
+  </div>
+</div>`;
+}
+
+function cvTemplate4(d, skills) {
+  return `<div class="cv-t4">
+  <div class="cv-header">
+    <div>
+      <div class="cv-name">${d.name}</div>
+      <div class="cv-title">${d.title}</div>
+    </div>
+    <div class="cv-contact">
+      <div class="cv-contact-item">${d.email}</div>
+      <div class="cv-contact-item">${d.phone}</div>
+      <div class="cv-contact-item">${d.location}</div>
+    </div>
+  </div>
+  <div class="cv-accent-bar"></div>
+  <div class="cv-body">
+    <div>
+      <div class="cv-section-head">Professional Summary</div>
+      <div style="font-size:0.85rem;color:#444;line-height:1.7;margin-bottom:1rem;">${d.summary}</div>
+      <div class="cv-section-head">Experience</div>
+      <div class="cv-entry">
+        <div class="cv-entry-header">
+          <div class="cv-entry-title">Senior Product Designer</div>
+          <div class="cv-entry-date">2021 – Present</div>
+        </div>
+        <div class="cv-entry-sub">Monzo Bank · London</div>
+        <div class="cv-entry-desc">Led complete redesign of core banking application, driving a 34% increase in user engagement. Managed a team of 6 designers. Reduced support queries by 18% through improved UX flows.</div>
+      </div>
+      <div class="cv-entry">
+        <div class="cv-entry-header">
+          <div class="cv-entry-title">UX Designer</div>
+          <div class="cv-entry-date">2018 – 2021</div>
+        </div>
+        <div class="cv-entry-sub">Revolut · London</div>
+        <div class="cv-entry-desc">Designed the cryptocurrency trading interface from concept to launch for 3M+ users. Collaborated cross-functionally with engineering, compliance, and marketing.</div>
+      </div>
+      <div class="cv-section-head">Education</div>
+      <div class="cv-entry">
+        <div class="cv-entry-title">${d.edu}</div>
+      </div>
+    </div>
+    <div>
+      <div class="cv-section-head">Core Skills</div>
+      ${skills.slice(0,6).map((s,i)=>`<div class="skill-item"><div class="skill-name">${s}</div><div class="skill-dots">${Array.from({length:5},(_,j)=>`<div class="skill-dot${j<5-Math.floor(i/2)?' filled':''}"></div>`).join('')}</div></div>`).join('')}
+      <div class="s-head" style="margin-top:1.5rem;">Certifications</div>
+      <div style="font-size:0.75rem;color:#555;line-height:1.8;">${(d.certs||'').split('·').map(c=>`<div>${c.trim()}</div>`).join('')}</div>
+      <div class="s-head">Languages</div>
+      <div style="font-size:0.75rem;color:#555;line-height:1.8;">${d.langs}</div>
+    </div>
+  </div>
+</div>`;
+}
+
+function cvTemplate5(d, skills) {
+  return `<div class="cv-t5">
+  <div class="cv-header">
+    <div>
+      <div class="cv-name">${d.name}</div>
+      <div class="cv-title">${d.title}</div>
+    </div>
+    <div>
+      <div class="cv-contact-item">${d.email}</div>
+      <div class="cv-contact-item">${d.phone}</div>
+      <div class="cv-contact-item">${d.location}</div>
+      <div class="cv-contact-item">${d.link}</div>
+    </div>
+  </div>
+  <div class="cv-body">
+    <div>
+      <div class="cv-section-head">Profile</div>
+      <div class="cv-entry-desc" style="margin-bottom:1.5rem;">${d.summary}</div>
+      <div class="cv-section-head">Professional Experience</div>
+      <div class="cv-entry">
+        <div class="cv-entry-title">Senior Product Designer</div>
+        <div class="cv-entry-sub">Monzo Bank</div>
+        <div class="cv-entry-date">2021 – Present</div>
+        <div class="cv-entry-desc">Led complete redesign of core banking application, achieving a 34% uplift in user engagement and 18% reduction in support queries. Directed a team of 6 designers.</div>
+      </div>
+      <div class="cv-entry">
+        <div class="cv-entry-title">UX Designer</div>
+        <div class="cv-entry-sub">Revolut</div>
+        <div class="cv-entry-date">2018 – 2021</div>
+        <div class="cv-entry-desc">Designed the crypto trading interface from concept to launch for 3M+ users. Cross-functional collaboration with engineering, compliance, and marketing.</div>
+      </div>
+    </div>
+    <div>
+      <div class="cv-section-head">Education</div>
+      <div style="font-size:0.85rem;color:#333;line-height:1.6;margin-bottom:1rem;">${d.edu}</div>
+      <div class="cv-section-head">Skills</div>
+      <div class="cv-skills">${skills.map(s=>`<span class="cv-skill">${s}</span>`).join('')}</div>
+      <div class="cv-section-head" style="margin-top:1.5rem;">Languages</div>
+      <div style="font-size:0.85rem;color:#444;line-height:1.8;">${d.langs}</div>
+      <div class="cv-section-head" style="margin-top:1.5rem;">Certifications</div>
+      <div style="font-size:0.8rem;color:#444;line-height:1.8;">${d.certs||''}</div>
+    </div>
+  </div>
+</div>`;
+}
+
+// ── FUNCTIONS ──
+function selectDesign(n, el) {
+  document.querySelectorAll('.design-thumb').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  currentDesign = n;
+  renderCV();
+}
+
+function triggerAIDesign(el) {
+  document.querySelectorAll('.design-thumb').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const d = getFormData();
+  const target = (d.target + d.title).toLowerCase();
+  if(target.includes('tech')||target.includes('engineer')||target.includes('dev')) currentDesign = 2;
+  else if(target.includes('design')||target.includes('creative')||target.includes('art')) currentDesign = 3;
+  else if(target.includes('finance')||target.includes('law')||target.includes('executive')) currentDesign = 1;
+  else if(target.includes('manag')||target.includes('director')||target.includes('head')) currentDesign = 4;
+  else if(target.includes('sustain')||target.includes('ngo')||target.includes('research')) currentDesign = 5;
+  else currentDesign = Math.floor(Math.random()*5)+1;
+  generateCV();
+}
+
+function switchTab(evt, id) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  evt.target.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+function setZoom(z, btn) {
+  document.querySelectorAll('.ctrl-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentZoom = z;
+  const frame = document.getElementById('cv-frame');
+  frame.style.transform = `scale(${z})`;
+  frame.style.transformOrigin = 'top center';
+  const wrapper = document.querySelector('.cv-preview-wrapper');
+  wrapper.style.paddingTop = z < 1 ? '1rem' : '2rem';
+}
+
+async function generateCV() {
+  const btn = document.getElementById('gen-btn');
+  const statusEl = document.getElementById('ai-status');
+  const statusText = document.getElementById('ai-status-text');
+
+  btn.disabled = true;
+  document.getElementById('gen-btn-text').textContent = '✦ Generating...';
+  statusEl.classList.add('visible');
+
+  for (let i = 0; i < statusMessages.length; i++) {
+    statusText.textContent = statusMessages[i];
+    await new Promise(r => setTimeout(r, 600));
+  }
+
+  renderCV();
+
+  statusEl.classList.remove('visible');
+  btn.disabled = false;
+  document.getElementById('gen-btn-text').textContent = '✦ Generate My CV';
+
+  document.querySelector('.cv-preview-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderCV() {
+  const frame = document.getElementById('cv-frame');
+  frame.style.opacity = '0';
+  frame.style.transform = `scale(${currentZoom}) translateY(10px)`;
+  setTimeout(() => {
+    frame.innerHTML = getCV(currentDesign);
+    frame.style.transition = 'all 0.5s ease';
+    frame.style.opacity = '1';
+    frame.style.transform = `scale(${currentZoom}) translateY(0)`;
+  }, 200);
+}
+
+function applyTemplate(n) {
+  currentDesign = n;
+  document.querySelectorAll('.design-thumb').forEach(t=>{
+    if(parseInt(t.dataset.design)===n) t.classList.add('active');
+    else t.classList.remove('active');
+  });
+  generateCV();
+  document.getElementById('builder').scrollIntoView({behavior:'smooth'});
+}
+
+function printCV() {
+  const content = document.getElementById('cv-frame').innerHTML;
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>CV – ${getFormData().name}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box;}
+      body{background:#fff;}
+      @media print{@page{margin:0;size:A4;}body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+    </style>
+    <style>${document.querySelector('style').innerText}</style>
+    </head><body>${content}</body></html>`);
+  win.document.close();
+  setTimeout(() => win.print(), 800);
+}
+
+// ── SHOWCASE PREVIEWS ──
+function renderShowcasePreviews() {
+  const sampleData = {
+    name: 'Alexandra Chen', title: 'Senior Product Designer',
+    email: 'a.chen@design.co', phone: '+44 7890 123456',
+    location: 'London, UK', link: 'linkedin.com/in/achen',
+    summary: 'Award-winning designer with 8+ years crafting digital experiences for Fortune 500 companies.',
+    skills: 'Figma, Design Systems, User Research, Prototyping',
+    edu: 'BA Graphic Design — CSM, 2018',
+    certs: 'Google UX Certificate · Awwwards 2023',
+    langs: 'English · Mandarin · French',
+    initials: () => 'AC'
+  };
+  const skillsArr = sampleData.skills.split(',').map(s=>s.trim());
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById(`showcase-t${i}`);
+    if (el) el.innerHTML = getCV(i, sampleData);
+  }
+}
+
+// ── SCROLL REVEAL ──
+function initReveal() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+}
+
+// ── INIT ──
+window.addEventListener('load', () => {
+  renderCV();
+  renderShowcasePreviews();
+  initReveal();
+});
+</script>
+
+</body>
+</html>
