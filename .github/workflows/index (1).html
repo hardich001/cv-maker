@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrestigeCV — AI-Powered Resume Architect</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold:#C9A84C;--gold-light:#E8D5A3;--gold-dark:#8B6914;
+    --obsidian:#0A0A0F;--obsidian-mid:#12121A;--obsidian-soft:#1C1C28;--obsidian-border:#2A2A3A;
+    --silver:#A8B0C0;--white:#F5F3EF;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--obsidian);color:var(--white);font-family:'Syne',sans-serif;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4;}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;border-bottom:1px solid rgba(201,168,76,.15);background:rgba(10,10,15,.88);backdrop-filter:blur(20px);}
+  .nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;letter-spacing:.15em;color:var(--gold);}
+  .nav-logo span{color:var(--white);font-weight:300;}
+  .nav-links{display:flex;gap:2.5rem;list-style:none;}
+  .nav-links a{font-size:.75rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--silver);text-decoration:none;transition:color .3s;}
+  .nav-links a:hover{color:var(--gold);}
+  .nav-cta{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:var(--obsidian);border:none;padding:.6rem 1.5rem;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s;}
+  .nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(201,168,76,.3);}
+
+  /* HERO */
+  .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8rem 2rem 6rem;text-align:center;overflow:hidden;}
+  .hero-bg-line{position:absolute;width:1px;background:linear-gradient(to bottom,transparent,rgba(201,168,76,.3),transparent);top:0;bottom:0;}
+  .hero-bg-line:nth-child(1){left:20%}.hero-bg-line:nth-child(2){left:50%}.hero-bg-line:nth-child(3){left:80%}
+  .hero-eyebrow{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;opacity:0;animation:fadeUp .8s .2s forwards;}
+  .hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,8vw,7.5rem);font-weight:300;line-height:.95;letter-spacing:-.02em;margin-bottom:2rem;opacity:0;animation:fadeUp .8s .4s forwards;}
+  .hero h1 em{font-style:italic;color:var(--gold);display:block;}
+  .hero-sub{max-width:540px;font-size:1rem;color:var(--silver);line-height:1.7;margin-bottom:3rem;opacity:0;animation:fadeUp .8s .6s forwards;}
+  .hero-actions{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp .8s .8s forwards;}
+  .btn-primary{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:var(--obsidian);border:none;padding:1rem 2.5rem;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .3s;}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(201,168,76,.35);}
+  .btn-ghost{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,.2);padding:1rem 2.5rem;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .3s;}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+  .hero-stats{position:absolute;bottom:3rem;display:flex;gap:4rem;opacity:0;animation:fadeUp .8s 1s forwards;}
+  .stat{text-align:center;}
+  .stat-number{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;color:var(--gold);display:block;line-height:1;}
+  .stat-label{font-size:.65rem;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin-top:.3rem;display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+  /* SECTIONS */
+  section{position:relative;z-index:1;}
+  .section-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;}
+  .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,5vw,3.8rem);font-weight:300;line-height:1.1;margin-bottom:1rem;}
+  .section-title em{font-style:italic;color:var(--gold);}
+
+  /* BUILDER */
+  #builder{padding:6rem 3rem;background:var(--obsidian-mid);}
+  .builder-header{max-width:600px;margin:0 auto 4rem;text-align:center;}
+  .builder-header p{color:var(--silver);font-size:1rem;line-height:1.7;}
+  .builder-layout{display:grid;grid-template-columns:420px 1fr;gap:3rem;max-width:1350px;margin:0 auto;}
+
+  /* INPUT PANEL */
+  .input-panel{background:var(--obsidian-soft);border:1px solid var(--obsidian-border);padding:2rem;}
+  .panel-title{font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--obsidian-border);}
+  .form-group{margin-bottom:1.1rem;}
+  .form-label{display:block;font-size:.62rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin-bottom:.35rem;}
+  .form-input,.form-textarea,.form-select{width:100%;background:var(--obsidian);border:1px solid var(--obsidian-border);color:var(--white);padding:.55rem .85rem;font-family:'Syne',sans-serif;font-size:.83rem;transition:border-color .3s;outline:none;appearance:none;}
+  .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--gold);}
+  .form-textarea{resize:vertical;min-height:72px;line-height:1.6;}
+  .form-select option{background:var(--obsidian-soft);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+
+  /* TABS */
+  .tabs{display:flex;gap:.4rem;margin-bottom:1.4rem;flex-wrap:wrap;}
+  .tab{background:transparent;border:1px solid var(--obsidian-border);color:var(--silver);padding:.35rem .9rem;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s;}
+  .tab.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08);}
+  .tab:hover:not(.active){border-color:rgba(201,168,76,.4);color:rgba(201,168,76,.7);}
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+
+  /* EXPERIENCE BLOCKS */
+  .exp-block{background:var(--obsidian);border:1px solid var(--obsidian-border);border-left:3px solid var(--gold);padding:1rem;margin-bottom:1rem;position:relative;}
+  .exp-block-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;}
+  .exp-block-num{font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);}
+  .remove-btn{background:transparent;border:1px solid #3A2A2A;color:#C45C6A;padding:.2rem .55rem;font-size:.65rem;font-weight:700;cursor:pointer;letter-spacing:.08em;transition:all .3s;}
+  .remove-btn:hover{background:#C45C6A;color:#fff;border-color:#C45C6A;}
+  .add-btn{width:100%;background:transparent;border:1px dashed var(--obsidian-border);color:var(--silver);padding:.6rem;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .3s;margin-top:.5rem;}
+  .add-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+  /* EDU BLOCKS */
+  .edu-block{background:var(--obsidian);border:1px solid var(--obsidian-border);border-left:3px solid #2D8C6B;padding:1rem;margin-bottom:1rem;position:relative;}
+
+  /* DESIGN SELECTOR */
+  .design-selector{margin-top:1.5rem;margin-bottom:.5rem;}
+  .design-selector-title{font-size:.62rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin-bottom:.7rem;}
+  .design-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.45rem;}
+  .design-thumb{aspect-ratio:3/4;border:2px solid transparent;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+  .design-thumb.active{border-color:var(--gold);}
+  .design-thumb:hover{border-color:rgba(201,168,76,.5);}
+  .design-thumb-inner{width:100%;height:100%;}
+  .dt-1{background:#F5F3EF;}.dt-2{background:#0D1117;}.dt-3{background:#1A0A2E;}.dt-4{background:#0A1628;}.dt-5{background:#FAF7F0;}.dt-ai{background:#12121A;}
+  .design-thumb-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.75);font-size:.48rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#fff;padding:2px 3px;text-align:center;}
+
+  /* GENERATE + DOWNLOAD BUTTONS */
+  .generate-btn{width:100%;background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:var(--obsidian);border:none;padding:1rem;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .3s;margin-top:1.2rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+  .generate-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(201,168,76,.3);}
+  .generate-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+  .ai-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);padding:.3rem .75rem;font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;}
+  .ai-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  /* PREVIEW PANEL */
+  .preview-panel{display:flex;flex-direction:column;gap:1rem;}
+  .preview-controls{display:flex;align-items:center;justify-content:space-between;background:var(--obsidian-soft);border:1px solid var(--obsidian-border);padding:.75rem 1.25rem;flex-wrap:wrap;gap:.5rem;}
+  .preview-controls-left{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .ctrl-btn{background:transparent;border:1px solid var(--obsidian-border);color:var(--silver);padding:.32rem .75rem;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s;}
+  .ctrl-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .ctrl-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08);}
+  .download-group{display:flex;gap:.5rem;}
+  .dl-btn{border:1px solid var(--gold);color:var(--gold);padding:.32rem 1rem;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s;background:transparent;}
+  .dl-btn:hover{background:var(--gold);color:var(--obsidian);}
+  .dl-btn.word{border-color:#2D8C6B;color:#2D8C6B;}
+  .dl-btn.word:hover{background:#2D8C6B;color:#fff;}
+  .cv-preview-wrapper{background:#777;border:1px solid var(--obsidian-border);overflow:auto;position:relative;min-height:700px;display:flex;align-items:flex-start;justify-content:center;padding:2rem;}
+  .cv-frame{width:100%;max-width:700px;box-shadow:0 30px 80px rgba(0,0,0,.6);transform-origin:top center;transition:all .5s cubic-bezier(.25,.46,.45,.94);}
+
+  /* AI STATUS */
+  .ai-status{background:var(--obsidian-soft);border:1px solid var(--obsidian-border);border-left:3px solid var(--gold);padding:.75rem 1.25rem;display:none;align-items:center;gap:.75rem;font-size:.8rem;color:var(--silver);}
+  .ai-status.visible{display:flex;}
+  .loading-dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin:0 2px;animation:bounce 1.2s infinite;}
+  .loading-dots span:nth-child(2){animation-delay:.2s}.loading-dots span:nth-child(3){animation-delay:.4s}
+  @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+
+  /* ═══ CV TEMPLATES ═══ */
+
+  /* T1: Ivory Prestige */
+  .cv-t1{background:#FAF8F5;color:#1A1A1A;font-family:'Cormorant Garamond',serif;padding:2.8rem;min-height:900px;}
+  .cv-t1 .cv-header{border-bottom:2px solid #C9A84C;padding-bottom:1.4rem;margin-bottom:1.8rem;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:end;}
+  .cv-t1 .cv-name{font-size:2.8rem;font-weight:300;line-height:1;letter-spacing:-.01em;color:#1A1A1A;}
+  .cv-t1 .cv-title{font-size:.85rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:#C9A84C;margin-top:.3rem;font-family:'Syne',sans-serif;}
+  .cv-t1 .cv-contact{text-align:right;}
+  .cv-t1 .cv-contact-item{font-size:.78rem;font-family:'Syne',sans-serif;color:#555;line-height:1.8;}
+  .cv-t1 .cv-section{margin-bottom:1.6rem;}
+  .cv-t1 .cv-sh{font-size:.62rem;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#C9A84C;margin-bottom:.75rem;display:flex;align-items:center;gap:.8rem;}
+  .cv-t1 .cv-sh::after{content:'';flex:1;height:1px;background:rgba(201,168,76,.3);}
+  .cv-t1 .cv-entry{margin-bottom:1.1rem;}
+  .cv-t1 .cv-et{font-size:1.05rem;font-weight:600;color:#1A1A1A;}
+  .cv-t1 .cv-es{font-size:.78rem;font-family:'Syne',sans-serif;color:#C9A84C;font-weight:500;}
+  .cv-t1 .cv-ed{font-size:.72rem;font-family:'DM Mono',monospace;color:#888;}
+  .cv-t1 .cv-desc{font-size:.88rem;color:#444;line-height:1.7;margin-top:.3rem;}
+  .cv-t1 .cv-skills{display:flex;flex-wrap:wrap;gap:.4rem;}
+  .cv-t1 .cv-skill{border:1px solid #C9A84C;color:#8B6914;padding:.18rem .75rem;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;}
+
+  /* T2: Midnight Carbon */
+  .cv-t2{background:#0D1117;color:#E0E6F0;font-family:'Syne',sans-serif;display:grid;grid-template-columns:210px 1fr;min-height:900px;}
+  .cv-t2 .cv-sidebar{background:#161B22;padding:2.2rem 1.4rem;}
+  .cv-t2 .cv-main{padding:2.2rem;}
+  .cv-t2 .cv-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#2E5FA3,#7C3F9E);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-family:'Cormorant Garamond',serif;font-weight:600;color:#fff;margin-bottom:1rem;}
+  .cv-t2 .cv-name{font-size:1rem;font-weight:700;color:#fff;margin-bottom:.25rem;line-height:1.2;}
+  .cv-t2 .cv-title{font-size:.6rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#5B8DEF;margin-bottom:1.8rem;}
+  .cv-t2 .s-head{font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#5B8DEF;margin-bottom:.6rem;margin-top:1.4rem;}
+  .cv-t2 .cv-ci{font-size:.72rem;color:#8B9BB4;line-height:1.9;}
+  .cv-t2 .skill-bar{margin-bottom:.55rem;}
+  .cv-t2 .skill-name{font-size:.7rem;color:#C0CAD8;margin-bottom:.18rem;}
+  .cv-t2 .skill-track{height:3px;background:#21262D;}
+  .cv-t2 .skill-fill{height:3px;background:linear-gradient(to right,#2E5FA3,#7C3F9E);}
+  .cv-t2 .m-name{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:#fff;line-height:1;margin-bottom:.4rem;}
+  .cv-t2 .m-sh{font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#5B8DEF;border-bottom:1px solid #21262D;padding-bottom:.4rem;margin-bottom:.9rem;margin-top:1.6rem;}
+  .cv-t2 .m-sh:first-child{margin-top:0;}
+  .cv-t2 .m-entry{margin-bottom:1.1rem;padding-left:.9rem;position:relative;}
+  .cv-t2 .m-entry::before{content:'';position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:50%;background:#5B8DEF;}
+  .cv-t2 .m-et{font-size:.92rem;font-weight:600;color:#E0E6F0;}
+  .cv-t2 .m-es{font-size:.72rem;color:#5B8DEF;font-weight:500;}
+  .cv-t2 .m-ed{font-family:'DM Mono',monospace;font-size:.62rem;color:#555F6E;}
+  .cv-t2 .m-desc{font-size:.78rem;color:#8B9BB4;line-height:1.7;margin-top:.25rem;}
+
+  /* T3: Violet Luxe */
+  .cv-t3{background:#F9F7FF;color:#1A0A2E;font-family:'Syne',sans-serif;min-height:900px;}
+  .cv-t3 .cv-header{background:linear-gradient(135deg,#1A0A2E 0%,#3D1A72 100%);color:#fff;padding:2.8rem;position:relative;overflow:hidden;}
+  .cv-t3 .cv-header::before{content:'';position:absolute;top:-50%;right:-10%;width:300px;height:300px;border-radius:50%;border:60px solid rgba(255,255,255,.05);}
+  .cv-t3 .cv-name{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;line-height:1;letter-spacing:-.02em;}
+  .cv-t3 .cv-title{font-size:.75rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:rgba(200,180,255,.9);margin-top:.45rem;}
+  .cv-t3 .cv-cr{display:flex;gap:2rem;margin-top:1.3rem;flex-wrap:wrap;}
+  .cv-t3 .cv-ci{font-size:.72rem;color:rgba(255,255,255,.7);}
+  .cv-t3 .cv-body{display:grid;grid-template-columns:1fr 195px;}
+  .cv-t3 .cv-main{padding:2.2rem;}
+  .cv-t3 .cv-aside{background:#F0EAFF;padding:1.8rem 1.4rem;border-left:1px solid #DDD0FF;}
+  .cv-t3 .a-head{font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#7C3F9E;margin-bottom:.6rem;margin-top:1.4rem;}
+  .cv-t3 .a-head:first-child{margin-top:0;}
+  .cv-t3 .cv-sh{font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#7C3F9E;margin-bottom:.75rem;display:flex;align-items:center;gap:.7rem;}
+  .cv-t3 .cv-sh::after{content:'';flex:1;height:2px;background:linear-gradient(to right,rgba(124,63,158,.3),transparent);}
+  .cv-t3 .cv-entry{margin-bottom:1.3rem;}
+  .cv-t3 .cv-et{font-size:.98rem;font-weight:600;color:#1A0A2E;}
+  .cv-t3 .cv-es{font-size:.72rem;color:#7C3F9E;font-weight:500;}
+  .cv-t3 .cv-ed{font-family:'DM Mono',monospace;font-size:.68rem;color:#888;}
+  .cv-t3 .cv-desc{font-size:.83rem;color:#444;line-height:1.7;margin-top:.28rem;}
+  .cv-t3 .skill-tag{display:inline-block;background:#E8DAFF;color:#4A1A7A;padding:.18rem .65rem;font-size:.65rem;font-weight:600;margin:.18rem;}
+
+  /* T4: Navy Executive */
+  .cv-t4{background:#fff;color:#0A1628;font-family:'Syne',sans-serif;min-height:900px;}
+  .cv-t4 .cv-header{background:#0A1628;color:#fff;padding:2.2rem 2.8rem;display:flex;justify-content:space-between;align-items:center;}
+  .cv-t4 .cv-name{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;line-height:1;}
+  .cv-t4 .cv-title{font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#4A90D9;margin-top:.38rem;}
+  .cv-t4 .cv-contact{text-align:right;}
+  .cv-t4 .cv-ci{font-size:.72rem;color:rgba(255,255,255,.7);line-height:1.9;}
+  .cv-t4 .cv-accent-bar{height:4px;background:linear-gradient(to right,#2E5FA3,#4A90D9,#2D8C6B);}
+  .cv-t4 .cv-body{padding:2.2rem 2.8rem;display:grid;grid-template-columns:1fr 210px;gap:2.8rem;}
+  .cv-t4 .cv-sh{font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2E5FA3;margin-bottom:.75rem;margin-top:1.8rem;border-bottom:1px solid #E0E8F0;padding-bottom:.4rem;}
+  .cv-t4 .cv-sh:first-child{margin-top:0;}
+  .cv-t4 .cv-entry{margin-bottom:1.1rem;}
+  .cv-t4 .cv-eh{display:flex;justify-content:space-between;align-items:baseline;}
+  .cv-t4 .cv-et{font-size:.92rem;font-weight:700;color:#0A1628;}
+  .cv-t4 .cv-ed{font-family:'DM Mono',monospace;font-size:.62rem;color:#2E5FA3;}
+  .cv-t4 .cv-es{font-size:.72rem;color:#2E5FA3;font-weight:600;margin-bottom:.28rem;}
+  .cv-t4 .cv-desc{font-size:.8rem;color:#444;line-height:1.7;}
+  .cv-t4 .s-head{font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2E5FA3;margin-bottom:.45rem;margin-top:1.4rem;}
+  .cv-t4 .s-head:first-child{margin-top:0;}
+  .cv-t4 .cv-ci-s{font-size:.75rem;color:#555;line-height:1.9;}
+  .cv-t4 .skill-item{display:flex;justify-content:space-between;align-items:center;margin-bottom:.45rem;}
+  .cv-t4 .skill-name{font-size:.72rem;color:#333;}
+  .cv-t4 .skill-dots{display:flex;gap:3px;}
+  .cv-t4 .skill-dot{width:8px;height:8px;border-radius:50%;background:#E0E8F0;}
+  .cv-t4 .skill-dot.filled{background:#2E5FA3;}
+
+  /* T5: Emerald Editorial */
+  .cv-t5{background:#FAF7F0;color:#1A1A0A;font-family:'Cormorant Garamond',serif;padding:2.8rem;min-height:900px;position:relative;}
+  .cv-t5::before{content:'';position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(to bottom,#2D8C6B,#1A5C44);}
+  .cv-t5 .cv-header{margin-bottom:1.8rem;display:grid;grid-template-columns:1fr 1fr;gap:2rem;border-bottom:1px solid #C9D8CC;padding-bottom:1.4rem;}
+  .cv-t5 .cv-name{font-size:2.8rem;font-weight:300;line-height:.95;letter-spacing:-.02em;}
+  .cv-t5 .cv-title{font-size:.78rem;font-family:'Syne',sans-serif;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#2D8C6B;margin-top:.55rem;}
+  .cv-t5 .cv-ci{font-size:.78rem;font-family:'Syne',sans-serif;color:#555;line-height:1.9;text-align:right;}
+  .cv-t5 .cv-sh{font-size:.62rem;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#2D8C6B;margin-bottom:.75rem;margin-top:1.8rem;}
+  .cv-t5 .cv-sh:first-child{margin-top:0;}
+  .cv-t5 .cv-entry{margin-bottom:1.2rem;border-left:2px solid #C9D8CC;padding-left:.9rem;}
+  .cv-t5 .cv-et{font-size:1.08rem;font-weight:600;color:#1A1A0A;}
+  .cv-t5 .cv-es{font-size:.78rem;font-family:'Syne',sans-serif;color:#2D8C6B;font-weight:500;}
+  .cv-t5 .cv-ed{font-family:'DM Mono',monospace;font-size:.68rem;color:#888;}
+  .cv-t5 .cv-desc{font-size:.9rem;color:#444;line-height:1.7;margin-top:.35rem;}
+  .cv-t5 .cv-skills{display:flex;flex-wrap:wrap;gap:.38rem;}
+  .cv-t5 .cv-skill{background:#EAF5EE;color:#1A5C44;padding:.18rem .75rem;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border:1px solid #C9D8CC;}
+  .cv-t5 .cv-body{display:grid;grid-template-columns:1fr 195px;gap:2.2rem;}
+
+  /* SHOWCASE */
+  #showcase{padding:6rem 3rem;background:var(--obsidian);}
+  .showcase-header{max-width:600px;margin:0 auto 4rem;text-align:center;}
+  .templates-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;max-width:1100px;margin:0 auto;}
+  .template-card{background:var(--obsidian-mid);border:1px solid var(--obsidian-border);overflow:hidden;cursor:pointer;transition:all .4s;position:relative;}
+  .template-card:hover{border-color:var(--gold);transform:translateY(-6px);box-shadow:0 30px 60px rgba(0,0,0,.4);}
+  .template-card-preview{height:260px;overflow:hidden;position:relative;}
+  .template-card-preview>div{transform:scale(.45);transform-origin:top left;width:222%;pointer-events:none;}
+  .template-card-info{padding:1.2rem;border-top:1px solid var(--obsidian-border);}
+  .template-card-name{font-size:.85rem;font-weight:700;color:var(--white);margin-bottom:.2rem;}
+  .template-card-tag{font-size:.62rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);}
+  .template-card-badge{position:absolute;top:.75rem;right:.75rem;background:var(--gold);color:var(--obsidian);font-size:.52rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .5rem;}
+
+  /* FEATURES */
+  #features{padding:6rem 3rem;background:var(--obsidian-mid);}
+  .features-header{max-width:600px;margin:0 auto 4rem;text-align:center;}
+  .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:1100px;margin:0 auto;}
+  .feature-card{background:var(--obsidian-soft);border:1px solid var(--obsidian-border);padding:2rem;transition:all .3s;position:relative;overflow:hidden;}
+  .feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,var(--gold-dark),var(--gold));opacity:0;transition:opacity .3s;}
+  .feature-card:hover::before{opacity:1;}
+  .feature-card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-3px);}
+  .feature-icon{width:42px;height:42px;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;font-size:1rem;}
+  .feature-title{font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.45rem;}
+  .feature-desc{font-size:.83rem;color:var(--silver);line-height:1.7;}
+
+  /* PROCESS */
+  #process{padding:6rem 3rem;background:var(--obsidian);}
+  .process-header{max-width:600px;margin:0 auto 4rem;text-align:center;}
+  .process-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;max-width:1000px;margin:0 auto;position:relative;}
+  .process-steps::before{content:'';position:absolute;top:24px;left:12.5%;right:12.5%;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,.4),transparent);}
+  .process-step{text-align:center;padding:0 1rem;}
+  .step-num{width:48px;height:48px;border:1px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--gold);margin:0 auto 1.2rem;background:var(--obsidian);}
+  .step-title{font-size:.88rem;font-weight:700;color:var(--white);margin-bottom:.45rem;}
+  .step-desc{font-size:.78rem;color:var(--silver);line-height:1.6;}
+
+  /* FOOTER */
+  footer{background:var(--obsidian-mid);border-top:1px solid var(--obsidian-border);padding:3rem;display:flex;align-items:center;justify-content:space-between;}
+  .footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;letter-spacing:.15em;color:var(--gold);}
+  .footer-copy{font-size:.72rem;color:var(--silver);}
+
+  .reveal{opacity:0;transform:translateY(30px);transition:all .7s cubic-bezier(.25,.46,.45,.94);}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  @media(max-width:1100px){.builder-layout{grid-template-columns:1fr;}.templates-grid{grid-template-columns:repeat(2,1fr);}.features-grid{grid-template-columns:repeat(2,1fr);}.process-steps{grid-template-columns:repeat(2,1fr);gap:2rem;}.process-steps::before{display:none;}}
+  @media(max-width:700px){nav{padding:1rem 1.5rem;}.nav-links{display:none;}.templates-grid{grid-template-columns:1fr;}.features-grid{grid-template-columns:1fr;}#builder,#showcase,#features,#process{padding:4rem 1.5rem;}.design-grid{grid-template-columns:repeat(3,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Prestige<span>CV</span></div>
+  <ul class="nav-links">
+    <li><a href="#builder">Builder</a></li>
+    <li><a href="#showcase">Templates</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#process">How it Works</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('builder').scrollIntoView({behavior:'smooth'})">Start Free</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg-line"></div>
+  <div class="hero-bg-line"></div>
+  <div class="hero-bg-line"></div>
+  <p class="hero-eyebrow">✦ AI-Powered Resume Architecture</p>
+  <h1>Craft CVs That<br><em>Command Attention</em></h1>
+  <p class="hero-sub">PrestigeCV uses advanced AI to generate bespoke, HR-optimised resume designs — tailored to your industry, role, and personal brand.</p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="document.getElementById('builder').scrollIntoView({behavior:'smooth'})">Build My CV Now</button>
+    <button class="btn-ghost" onclick="document.getElementById('showcase').scrollIntoView({behavior:'smooth'})">View Designs</button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-number">5</span><span class="stat-label">Premium Designs</span></div>
+    <div class="stat"><span class="stat-number">AI</span><span class="stat-label">Powered Engine</span></div>
+    <div class="stat"><span class="stat-number">PDF+DOC</span><span class="stat-label">Export Formats</span></div>
+  </div>
+</section>
+
+<!-- BUILDER -->
+<section id="builder">
+  <div class="builder-header reveal">
+    <p class="section-label">✦ The Engine</p>
+    <h2 class="section-title">Your <em>Intelligent</em> CV Builder</h2>
+    <p>Fill in your details, add as many experiences as you need, and let AI generate your perfect CV. Download as PDF or Word.</p>
+  </div>
+  <div class="builder-layout">
+
+    <!-- INPUT PANEL -->
+    <div class="input-panel reveal">
+      <div class="ai-badge"><div class="ai-dot"></div> AI Engine Active</div>
+      <div class="panel-title">Your Information</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(event,'personal')">Personal</button>
+        <button class="tab" onclick="switchTab(event,'experience')">Experience</button>
+        <button class="tab" onclick="switchTab(event,'education')">Education</button>
+        <button class="tab" onclick="switchTab(event,'skills')">Skills</button>
+      </div>
+
+      <!-- ── PERSONAL TAB ── -->
+      <div class="tab-content active" id="tab-personal">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" id="inp-name" type="text" placeholder="e.g. Alexandra Chen" value="Alexandra Chen">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Professional Title</label>
+          <input class="form-input" id="inp-title" type="text" placeholder="e.g. Senior Product Designer" value="Senior Product Designer">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" id="inp-email" type="email" placeholder="you@email.com" value="a.chen@design.co">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-input" id="inp-phone" type="text" placeholder="+44 7890 000000" value="+44 7890 123456">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input class="form-input" id="inp-location" type="text" placeholder="City, Country" value="London, UK">
+          </div>
+          <div class="form-group">
+            <label class="form-label">LinkedIn / Portfolio</label>
+            <input class="form-input" id="inp-link" type="text" placeholder="linkedin.com/in/you" value="linkedin.com/in/achen">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Professional Summary</label>
+          <textarea class="form-textarea" id="inp-summary" placeholder="Describe yourself in 2-3 sentences...">Award-winning designer with 8+ years crafting digital experiences for Fortune 500 companies. Specialising in product strategy, UI/UX, and design systems.</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Target Role / Industry</label>
+          <input class="form-input" id="inp-target" type="text" placeholder="e.g. Design Lead at a tech startup" value="Head of Design · FinTech / SaaS">
+        </div>
+      </div>
+
+      <!-- ── EXPERIENCE TAB ── -->
+      <div class="tab-content" id="tab-experience">
+        <div id="exp-list"></div>
+        <button class="add-btn" onclick="addExperience()">+ Add Experience</button>
+      </div>
+
+      <!-- ── EDUCATION TAB ── -->
+      <div class="tab-content" id="tab-education">
+        <div id="edu-list"></div>
+        <button class="add-btn" onclick="addEducation()">+ Add Education</button>
+      </div>
+
+      <!-- ── SKILLS TAB ── -->
+      <div class="tab-content" id="tab-skills">
+        <div class="form-group">
+          <label class="form-label">Core Skills <span style="color:var(--silver);font-weight:400;text-transform:none;letter-spacing:0;">(comma-separated)</span></label>
+          <textarea class="form-textarea" id="inp-skills" style="min-height:62px">Figma, Design Systems, User Research, Prototyping, Framer, UX Strategy</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tools &amp; Technologies</label>
+          <textarea class="form-textarea" id="inp-tools" style="min-height:55px">Adobe CC, Notion, Jira, HTML/CSS, Principle</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Certifications / Awards <span style="color:var(--silver);font-weight:400;text-transform:none;letter-spacing:0;">(one per line or · separated)</span></label>
+          <textarea class="form-textarea" id="inp-certs" style="min-height:70px">Google UX Design Certificate
+Awwwards Site of the Year 2023
+FWA Award 2022</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Languages</label>
+          <input class="form-input" id="inp-langs" value="English (Native) · Mandarin (Fluent) · French (Conversational)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Interests / Hobbies <span style="color:var(--silver);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+          <input class="form-input" id="inp-interests" placeholder="e.g. Photography, Open-source, Public speaking">
+        </div>
+      </div>
+
+      <!-- DESIGN SELECTOR -->
+      <div class="design-selector">
+        <div class="design-selector-title">Choose Design Style</div>
+        <div class="design-grid">
+          <div class="design-thumb active dt-1" data-design="1" onclick="selectDesign(1,this)">
+            <div class="design-thumb-inner"><div style="background:#C9A84C;height:20%;"></div></div>
+            <div class="design-thumb-label">Ivory</div>
+          </div>
+          <div class="design-thumb dt-2" data-design="2" onclick="selectDesign(2,this)">
+            <div class="design-thumb-inner"><div style="background:#161B22;height:100%;"></div></div>
+            <div class="design-thumb-label">Carbon</div>
+          </div>
+          <div class="design-thumb dt-3" data-design="3" onclick="selectDesign(3,this)">
+            <div class="design-thumb-inner"><div style="background:linear-gradient(#1A0A2E,#3D1A72);height:28%;"></div></div>
+            <div class="design-thumb-label">Violet</div>
+          </div>
+          <div class="design-thumb dt-4" data-design="4" onclick="selectDesign(4,this)">
+            <div class="design-thumb-inner"><div style="background:#0A1628;height:24%;"></div></div>
+            <div class="design-thumb-label">Navy</div>
+          </div>
+          <div class="design-thumb dt-5" data-design="5" onclick="selectDesign(5,this)">
+            <div class="design-thumb-inner"><div style="background:#2D8C6B;width:6px;height:100%;float:left;"></div></div>
+            <div class="design-thumb-label">Emerald</div>
+          </div>
+          <div class="design-thumb dt-ai" data-design="ai" onclick="triggerAIDesign(this)">
+            <div class="design-thumb-inner" style="display:flex;align-items:center;justify-content:center;height:100%;"><span style="color:#C9A84C;font-size:1.1rem;">✦</span></div>
+            <div class="design-thumb-label" style="background:var(--gold);color:#0A0A0F;">AI Pick</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="generate-btn" id="gen-btn" onclick="generateCV()">
+        <span id="gen-btn-text">✦ Generate My CV</span>
+      </button>
+    </div>
+
+    <!-- PREVIEW PANEL -->
+    <div class="preview-panel reveal">
+      <div class="ai-status" id="ai-status">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+        <span id="ai-status-text">AI is crafting your perfect CV...</span>
+      </div>
+      <div class="preview-controls">
+        <div class="preview-controls-left">
+          <button class="ctrl-btn active" onclick="setZoom(1,this)">100%</button>
+          <button class="ctrl-btn" onclick="setZoom(0.75,this)">75%</button>
+          <button class="ctrl-btn" onclick="setZoom(0.5,this)">50%</button>
+        </div>
+        <div class="download-group">
+          <button class="dl-btn" onclick="downloadPDF()">↓ PDF</button>
+          <button class="dl-btn word" onclick="downloadWord()">↓ Word</button>
+        </div>
+      </div>
+      <div class="cv-preview-wrapper">
+        <div class="cv-frame" id="cv-frame"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- TEMPLATE SHOWCASE -->
+<section id="showcase">
+  <div class="showcase-header reveal">
+    <p class="section-label">✦ The Collection</p>
+    <h2 class="section-title">Five <em>Iconic</em> Designs</h2>
+    <p style="color:var(--silver);font-size:1rem;line-height:1.7;">Each template is architecturally distinct — crafted to make an indelible impression on hiring managers and recruitment teams. Click any to apply it instantly.</p>
+  </div>
+  <div class="templates-grid">
+    <div class="template-card reveal" onclick="applyTemplate(1)">
+      <div class="template-card-preview"><div id="showcase-t1"></div></div>
+      <div class="template-card-info"><div class="template-card-name">Ivory Prestige</div><div class="template-card-tag">Classic · Executive · Finance</div></div>
+      <div class="template-card-badge">Popular</div>
+    </div>
+    <div class="template-card reveal" onclick="applyTemplate(2)">
+      <div class="template-card-preview"><div id="showcase-t2"></div></div>
+      <div class="template-card-info"><div class="template-card-name">Midnight Carbon</div><div class="template-card-tag">Tech · Engineering · Dark</div></div>
+    </div>
+    <div class="template-card reveal" onclick="applyTemplate(3)">
+      <div class="template-card-preview"><div id="showcase-t3"></div></div>
+      <div class="template-card-info"><div class="template-card-name">Violet Luxe</div><div class="template-card-tag">Creative · Design · Premium</div></div>
+    </div>
+    <div class="template-card reveal" onclick="applyTemplate(4)">
+      <div class="template-card-preview"><div id="showcase-t4"></div></div>
+      <div class="template-card-info"><div class="template-card-name">Navy Executive</div><div class="template-card-tag">Corporate · Management · Law</div></div>
+    </div>
+    <div class="template-card reveal" onclick="applyTemplate(5)">
+      <div class="template-card-preview"><div id="showcase-t5"></div></div>
+      <div class="template-card-info"><div class="template-card-name">Emerald Editorial</div><div class="template-card-tag">Academia · Sustainability · NGO</div></div>
+    </div>
+    <div class="template-card reveal" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:340px;" onclick="triggerAIDesign(null)">
+      <div style="text-align:center;padding:2rem;">
+        <div style="font-size:2.5rem;color:var(--gold);margin-bottom:1rem;">✦</div>
+        <div class="template-card-name" style="font-size:1.1rem;margin-bottom:.5rem;">AI Bespoke</div>
+        <div class="template-card-tag">Let AI Choose the Perfect Design</div>
+        <div style="margin-top:1rem;font-size:.75rem;color:var(--silver);line-height:1.6;">Our engine analyses your role &amp; industry<br>to select the ideal template automatically</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="features-header reveal">
+    <p class="section-label">✦ The Advantage</p>
+    <h2 class="section-title">Built for <em>Impact</em></h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal"><div class="feature-icon">✦</div><div class="feature-title">Dynamic Experience Builder</div><div class="feature-desc">Add unlimited work experiences with dedicated fields for job title, company, dates, and key achievements — all reflected live in the preview.</div></div>
+    <div class="feature-card reveal"><div class="feature-icon">◈</div><div class="feature-title">Smart Design Selection</div><div class="feature-desc">The AI engine reads your industry and seniority to recommend the most effective visual presentation strategy for your target employers.</div></div>
+    <div class="feature-card reveal"><div class="feature-icon">⬡</div><div class="feature-title">ATS Optimised</div><div class="feature-desc">Every template is engineered to pass Applicant Tracking Systems with clean semantic structure and keyword-rich formatting.</div></div>
+    <div class="feature-card reveal"><div class="feature-icon">❋</div><div class="feature-title">Real-Time Preview</div><div class="feature-desc">Watch your CV transform instantly as you fill in details. See every change before committing to download.</div></div>
+    <div class="feature-card reveal"><div class="feature-icon">◉</div><div class="feature-title">PDF &amp; Word Export</div><div class="feature-desc">Download your finished CV as a pixel-perfect PDF for digital submission, or a fully editable Word document for further customisation.</div></div>
+    <div class="feature-card reveal"><div class="feature-icon">⟡</div><div class="feature-title">5 Premium Templates</div><div class="feature-desc">From ivory prestige to midnight carbon — each design crafted to make an indelible impression on HR teams and hiring agencies.</div></div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="process-header reveal">
+    <p class="section-label">✦ The Process</p>
+    <h2 class="section-title">Four Steps to <em>Hired</em></h2>
+  </div>
+  <div class="process-steps">
+    <div class="process-step reveal"><div class="step-num">01</div><div class="step-title">Enter Your Details</div><div class="step-desc">Fill in personal info, add all your experiences, education, and skills using dedicated sections.</div></div>
+    <div class="process-step reveal"><div class="step-num">02</div><div class="step-title">AI Selects Design</div><div class="step-desc">The engine analyses your industry and role type to recommend the most effective visual format.</div></div>
+    <div class="process-step reveal"><div class="step-num">03</div><div class="step-title">Preview &amp; Refine</div><div class="step-desc">Live preview updates as you type. Zoom in, switch templates, and perfect every detail before export.</div></div>
+    <div class="process-step reveal"><div class="step-num">04</div><div class="step-title">Download &amp; Apply</div><div class="step-desc">Export as PDF or editable Word document. Ready for immediate submission to any employer or agency.</div></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">PrestigeCV</div>
+  <div class="footer-copy">© 2026 PrestigeCV — Intelligent Resume Architecture. All rights reserved.</div>
+</footer>
+
+<script>
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+let currentDesign = 1;
+let currentZoom = 1;
+let expCount = 0;
+let eduCount = 0;
+
+const statusMessages = [
+  'Analysing your professional profile...',
+  'Selecting optimal design architecture...',
+  'Building your experience timeline...',
+  'Optimising for ATS compatibility...',
+  'Applying typography precision...',
+  'Finalising your masterpiece...'
+];
+
+// ══════════════════════════════════════
+//  DYNAMIC EXPERIENCE BLOCKS
+// ══════════════════════════════════════
+function addExperience(data) {
+  expCount++;
+  const id = expCount;
+  const d = data || {};
+  const html = `
+  <div class="exp-block" id="exp-block-${id}">
+    <div class="exp-block-head">
+      <span class="exp-block-num">Experience #${id}</span>
+      <button class="remove-btn" onclick="removeBlock('exp-block-${id}')">✕ Remove</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Job Title</label>
+      <input class="form-input exp-jobtitle" type="text" placeholder="e.g. Senior Engineer" value="${d.title||''}">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Company</label>
+        <input class="form-input exp-company" type="text" placeholder="e.g. Google" value="${d.company||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Location</label>
+        <input class="form-input exp-loc" type="text" placeholder="e.g. London, UK" value="${d.loc||''}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Start Date</label>
+        <input class="form-input exp-from" type="text" placeholder="e.g. Jan 2021" value="${d.from||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">End Date</label>
+        <input class="form-input exp-to" type="text" placeholder="Present" value="${d.to||''}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Key Achievements &amp; Responsibilities</label>
+      <textarea class="form-textarea exp-desc" style="min-height:80px" placeholder="Describe what you achieved, led, built, or improved...">${d.desc||''}</textarea>
+    </div>
+  </div>`;
+  document.getElementById('exp-list').insertAdjacentHTML('beforeend', html);
+}
+
+function addEducation(data) {
+  eduCount++;
+  const id = eduCount;
+  const d = data || {};
+  const html = `
+  <div class="edu-block" id="edu-block-${id}">
+    <div class="exp-block-head">
+      <span class="exp-block-num" style="color:#2D8C6B;">Education #${id}</span>
+      <button class="remove-btn" onclick="removeBlock('edu-block-${id}')">✕ Remove</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Degree / Qualification</label>
+      <input class="form-input edu-degree" type="text" placeholder="e.g. BSc Computer Science" value="${d.degree||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Institution</label>
+      <input class="form-input edu-school" type="text" placeholder="e.g. University of Manchester" value="${d.school||''}">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Graduation Year</label>
+        <input class="form-input edu-year" type="text" placeholder="e.g. 2020" value="${d.year||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Grade / Result</label>
+        <input class="form-input edu-grade" type="text" placeholder="e.g. First Class Honours" value="${d.grade||''}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes <span style="color:var(--silver);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <input class="form-input edu-notes" type="text" placeholder="Dissertation topic, awards, activities..." value="${d.notes||''}">
+    </div>
+  </div>`;
+  document.getElementById('edu-list').insertAdjacentHTML('beforeend', html);
+}
+
+function removeBlock(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ══════════════════════════════════════
+//  COLLECT ALL FORM DATA
+// ══════════════════════════════════════
+function getFormData() {
+  // Collect experiences
+  const experiences = [];
+  document.querySelectorAll('#exp-list .exp-block').forEach(block => {
+    experiences.push({
+      title:   block.querySelector('.exp-jobtitle')?.value || '',
+      company: block.querySelector('.exp-company')?.value || '',
+      loc:     block.querySelector('.exp-loc')?.value || '',
+      from:    block.querySelector('.exp-from')?.value || '',
+      to:      block.querySelector('.exp-to')?.value || '',
+      desc:    block.querySelector('.exp-desc')?.value || ''
+    });
+  });
+
+  // Collect education
+  const education = [];
+  document.querySelectorAll('#edu-list .edu-block').forEach(block => {
+    education.push({
+      degree: block.querySelector('.edu-degree')?.value || '',
+      school: block.querySelector('.edu-school')?.value || '',
+      year:   block.querySelector('.edu-year')?.value || '',
+      grade:  block.querySelector('.edu-grade')?.value || '',
+      notes:  block.querySelector('.edu-notes')?.value || ''
+    });
+  });
+
+  const name = document.getElementById('inp-name')?.value || '';
+  const nameParts = name.trim().split(' ');
+  const initials = nameParts.map(p=>p[0]||'').join('').slice(0,2).toUpperCase();
+
+  return {
+    name,
+    initials,
+    title:    document.getElementById('inp-title')?.value || '',
+    email:    document.getElementById('inp-email')?.value || '',
+    phone:    document.getElementById('inp-phone')?.value || '',
+    location: document.getElementById('inp-location')?.value || '',
+    link:     document.getElementById('inp-link')?.value || '',
+    summary:  document.getElementById('inp-summary')?.value || '',
+    target:   document.getElementById('inp-target')?.value || '',
+    skills:   document.getElementById('inp-skills')?.value || '',
+    tools:    document.getElementById('inp-tools')?.value || '',
+    certs:    document.getElementById('inp-certs')?.value || '',
+    langs:    document.getElementById('inp-langs')?.value || '',
+    interests:document.getElementById('inp-interests')?.value || '',
+    experiences,
+    education
+  };
+}
+
+// ══════════════════════════════════════
+//  HELPER: render experience list in HTML
+// ══════════════════════════════════════
+function renderExpHTML(exps, entryClass, titleClass, subClass, dateClass, descClass) {
+  if (!exps || exps.length === 0) return `<div style="color:#888;font-size:.8rem;font-style:italic;">No experience added yet.</div>`;
+  return exps.map(e => `
+    <div class="${entryClass}">
+      <div class="${titleClass}">${e.title}</div>
+      <div class="${subClass}">${e.company}${e.loc ? ' · ' + e.loc : ''}</div>
+      <div class="${dateClass}">${e.from}${e.to ? ' – ' + e.to : ''}</div>
+      <div class="${descClass}">${e.desc}</div>
+    </div>`).join('');
+}
+
+function renderEduHTML(edus, containerStyle) {
+  if (!edus || edus.length === 0) return `<div style="color:#888;font-size:.8rem;font-style:italic;">No education added yet.</div>`;
+  return edus.map(e => `
+    <div style="${containerStyle}margin-bottom:.9rem;">
+      <div style="font-weight:600;">${e.degree}</div>
+      <div>${e.school}${e.grade ? ' · ' + e.grade : ''}</div>
+      ${e.year ? `<div style="opacity:.6;font-size:.85em;">${e.year}</div>` : ''}
+      ${e.notes ? `<div style="opacity:.6;font-size:.85em;font-style:italic;">${e.notes}</div>` : ''}
+    </div>`).join('');
+}
+
+function skillsArray(str) {
+  return str ? str.split(',').map(s => s.trim()).filter(Boolean) : [];
+}
+
+function certsArray(str) {
+  if (!str) return [];
+  return str.split(/[\n·]/).map(s => s.trim()).filter(Boolean);
+}
+
+// ══════════════════════════════════════
+//  CV TEMPLATES — ALL USE REAL FORM DATA
+// ══════════════════════════════════════
+function getCV(design, overrideData) {
+  const d = overrideData || getFormData();
+  const skills = skillsArray(d.skills);
+  const certs = certsArray(d.certs);
+  if (design === 1) return cvT1(d, skills, certs);
+  if (design === 2) return cvT2(d, skills, certs);
+  if (design === 3) return cvT3(d, skills, certs);
+  if (design === 4) return cvT4(d, skills, certs);
+  if (design === 5) return cvT5(d, skills, certs);
+  return cvT1(d, skills, certs);
+}
+
+function cvT1(d, skills, certs) {
+  const expHTML = d.experiences && d.experiences.length
+    ? d.experiences.map(e=>`
+      <div class="cv-entry">
+        <div class="cv-et">${e.title}</div>
+        <div class="cv-es">${e.company}${e.loc?' · '+e.loc:''}</div>
+        <div class="cv-ed">${e.from}${e.to?' – '+e.to:''}</div>
+        <div class="cv-desc">${e.desc}</div>
+      </div>`).join('')
+    : '<div class="cv-desc" style="color:#aaa;">Add your experience in the Experience tab.</div>';
+
+  const eduHTML = d.education && d.education.length
+    ? d.education.map(e=>`
+      <div class="cv-entry">
+        <div class="cv-et">${e.degree}</div>
+        <div class="cv-es">${e.school}${e.grade?' · '+e.grade:''}</div>
+        ${e.year?`<div class="cv-ed">${e.year}</div>`:''}
+        ${e.notes?`<div class="cv-desc">${e.notes}</div>`:''}
+      </div>`).join('')
+    : '<div class="cv-desc" style="color:#aaa;">Add education in the Education tab.</div>';
+
+  return `<div class="cv-t1">
+  <div class="cv-header">
+    <div>
+      <div class="cv-name">${d.name||'Your Name'}</div>
+      <div class="cv-title">${d.title||'Professional Title'}</div>
+    </div>
+    <div class="cv-contact">
+      ${d.email?`<div class="cv-contact-item">${d.email}</div>`:''}
+      ${d.phone?`<div class="cv-contact-item">${d.phone}</div>`:''}
+      ${d.location?`<div class="cv-contact-item">${d.location}</div>`:''}
+      ${d.link?`<div class="cv-contact-item">${d.link}</div>`:''}
+    </div>
+  </div>
+  ${d.summary?`<div class="cv-section"><div class="cv-sh">Profile</div><div class="cv-desc">${d.summary}</div></div>`:''}
+  <div class="cv-section"><div class="cv-sh">Experience</div>${expHTML}</div>
+  <div class="cv-section"><div class="cv-sh">Education</div>${eduHTML}</div>
+  ${skills.length?`<div class="cv-section"><div class="cv-sh">Core Skills</div><div class="cv-skills">${skills.map(s=>`<span class="cv-skill">${s}</span>`).join('')}</div></div>`:''}
+  ${certs.length?`<div class="cv-section"><div class="cv-sh">Certifications &amp; Awards</div>${certs.map(c=>`<div class="cv-desc" style="margin-bottom:.3rem;">▸ ${c}</div>`).join('')}</div>`:''}
+  ${d.langs?`<div class="cv-section"><div class="cv-sh">Languages</div><div class="cv-desc">${d.langs}</div></div>`:''}
+</div>`;
+}
+
+function cvT2(d, skills, certs) {
+  const expHTML = d.experiences && d.experiences.length
+    ? d.experiences.map(e=>`
+      <div class="m-entry">
+        <div class="m-et">${e.title}</div>
+        <div class="m-es">${e.company}${e.loc?' · '+e.loc:''}</div>
+        <div class="m-ed">${e.from}${e.to?' – '+e.to:''}</div>
+        <div class="m-desc">${e.desc}</div>
+      </div>`).join('')
+    : '<div class="m-desc">Add your experience in the Experience tab.</div>';
+
+  const eduHTML = d.education && d.education.length
+    ? d.education.map(e=>`<div class="cv-ci" style="font-size:.7rem;line-height:1.7;">${e.degree}${e.school?' — '+e.school:''}${e.year?', '+e.year:''}</div>`).join('')
+    : '';
+
+  return `<div class="cv-t2">
+  <div class="cv-sidebar">
+    <div class="cv-avatar">${d.initials||'?'}</div>
+    <div class="cv-name">${d.name||'Your Name'}</div>
+    <div class="cv-title">${d.title||'Title'}</div>
+    <div class="s-head">Contact</div>
+    ${d.email?`<div class="cv-ci">${d.email}</div>`:''}
+    ${d.phone?`<div class="cv-ci">${d.phone}</div>`:''}
+    ${d.location?`<div class="cv-ci">${d.location}</div>`:''}
+    ${d.link?`<div class="cv-ci">${d.link}</div>`:''}
+    ${skills.length?`<div class="s-head">Skills</div>${skills.slice(0,8).map((s,i)=>`<div class="skill-bar"><div class="skill-name">${s}</div><div class="skill-track"><div class="skill-fill" style="width:${95-i*7}%"></div></div></div>`).join('')}`:''}
+    ${eduHTML?`<div class="s-head">Education</div>${eduHTML}`:''}
+    ${d.langs?`<div class="s-head">Languages</div><div class="cv-ci" style="font-size:.7rem;line-height:1.8;">${d.langs}</div>`:''}
+    ${certs.length?`<div class="s-head">Certifications</div>${certs.map(c=>`<div class="cv-ci" style="font-size:.68rem;line-height:1.7;">▸ ${c}</div>`).join('')}`:''}
+  </div>
+  <div class="cv-main">
+    <div class="m-name">${d.name||'Your Name'}</div>
+    ${d.summary?`<p style="font-size:.8rem;color:#8B9BB4;line-height:1.7;margin-bottom:1.2rem;">${d.summary}</p>`:''}
+    <div class="m-sh">Experience</div>
+    ${expHTML}
+    ${d.tools?`<div class="m-sh">Tools &amp; Technologies</div><p style="font-size:.78rem;color:#8B9BB4;line-height:1.7;">${d.tools}</p>`:''}
+    ${d.interests?`<div class="m-sh">Interests</div><p style="font-size:.78rem;color:#8B9BB4;line-height:1.7;">${d.interests}</p>`:''}
+  </div>
+</div>`;
+}
+
+function cvT3(d, skills, certs) {
+  const expHTML = d.experiences && d.experiences.length
+    ? d.experiences.map(e=>`
+      <div class="cv-entry">
+        <div class="cv-et">${e.title}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.3rem;">
+          <div class="cv-es">${e.company}${e.loc?' · '+e.loc:''}</div>
+          <div class="cv-ed">${e.from}${e.to?' – '+e.to:''}</div>
+        </div>
+        <div class="cv-desc">${e.desc}</div>
+      </div>`).join('')
+    : '<div class="cv-desc" style="color:#aaa;">Add your experience in the Experience tab.</div>';
+
+  const eduItems = d.education && d.education.length
+    ? d.education.map(e=>`<div style="font-size:.78rem;color:#444;line-height:1.6;margin-bottom:.6rem;"><strong>${e.degree}</strong><br>${e.school}${e.grade?', '+e.grade:''}${e.year?'<br><span style=\'color:#888;font-size:.72rem;\'>'+e.year+'</span>':''}</div>`).join('')
+    : '';
+
+  return `<div class="cv-t3">
+  <div class="cv-header">
+    <div class="cv-name">${d.name||'Your Name'}</div>
+    <div class="cv-title">${d.title||'Professional Title'}</div>
+    <div class="cv-cr">
+      ${d.email?`<span class="cv-ci">${d.email}</span>`:''}
+      ${d.phone?`<span class="cv-ci">${d.phone}</span>`:''}
+      ${d.location?`<span class="cv-ci">${d.location}</span>`:''}
+      ${d.link?`<span class="cv-ci">${d.link}</span>`:''}
+    </div>
+  </div>
+  <div class="cv-body">
+    <div class="cv-main">
+      ${d.summary?`<div class="cv-sh">Profile</div><div class="cv-desc" style="font-size:.88rem;color:#333;line-height:1.7;margin-bottom:1.4rem;">${d.summary}</div>`:''}
+      <div class="cv-sh">Experience</div>
+      ${expHTML}
+    </div>
+    <div class="cv-aside">
+      ${skills.length?`<div class="a-head">Skills</div><div>${skills.map(s=>`<span class="skill-tag">${s}</span>`).join('')}</div>`:''}
+      ${d.tools?`<div class="a-head">Tools</div><div style="font-size:.75rem;color:#444;line-height:1.7;">${d.tools}</div>`:''}
+      ${eduItems?`<div class="a-head">Education</div>${eduItems}`:''}
+      ${d.langs?`<div class="a-head">Languages</div><div style="font-size:.75rem;color:#444;line-height:1.8;">${d.langs}</div>`:''}
+      ${certs.length?`<div class="a-head">Awards</div>${certs.map(c=>`<div style="font-size:.72rem;color:#444;line-height:1.7;">▸ ${c}</div>`).join('')}`:''}
+      ${d.interests?`<div class="a-head">Interests</div><div style="font-size:.75rem;color:#444;line-height:1.7;">${d.interests}</div>`:''}
+    </div>
+  </div>
+</div>`;
+}
+
+function cvT4(d, skills, certs) {
+  const expHTML = d.experiences && d.experiences.length
+    ? d.experiences.map((e,i)=>`
+      <div class="cv-entry">
+        <div class="cv-eh">
+          <div class="cv-et">${e.title}</div>
+          <div class="cv-ed">${e.from}${e.to?' – '+e.to:''}</div>
+        </div>
+        <div class="cv-es">${e.company}${e.loc?' · '+e.loc:''}</div>
+        <div class="cv-desc">${e.desc}</div>
+      </div>`).join('')
+    : '<div class="cv-desc" style="color:#aaa;">Add your experience in the Experience tab.</div>';
+
+  const eduHTML = d.education && d.education.length
+    ? d.education.map(e=>`
+      <div class="cv-entry">
+        <div class="cv-et" style="font-size:.88rem;">${e.degree}</div>
+        <div class="cv-es">${e.school}${e.grade?' · '+e.grade:''}</div>
+        ${e.year?`<div class="cv-ed">${e.year}</div>`:''}
+      </div>`).join('')
+    : '';
+
+  return `<div class="cv-t4">
+  <div class="cv-header">
+    <div>
+      <div class="cv-name">${d.name||'Your Name'}</div>
+      <div class="cv-title">${d.title||'Professional Title'}</div>
+    </div>
+    <div class="cv-contact">
+      ${d.email?`<div class="cv-ci">${d.email}</div>`:''}
+      ${d.phone?`<div class="cv-ci">${d.phone}</div>`:''}
+      ${d.location?`<div class="cv-ci">${d.location}</div>`:''}
+      ${d.link?`<div class="cv-ci">${d.link}</div>`:''}
+    </div>
+  </div>
+  <div class="cv-accent-bar"></div>
+  <div class="cv-body">
+    <div>
+      ${d.summary?`<div class="cv-sh">Professional Summary</div><div style="font-size:.83rem;color:#444;line-height:1.7;margin-bottom:.8rem;">${d.summary}</div>`:''}
+      <div class="cv-sh">Experience</div>
+      ${expHTML}
+      ${eduHTML?`<div class="cv-sh">Education</div>${eduHTML}`:''}
+    </div>
+    <div>
+      ${skills.length?`<div class="cv-sh" style="margin-top:0;">Core Skills</div>${skills.slice(0,7).map((s,i)=>`<div class="skill-item"><div class="skill-name">${s}</div><div class="skill-dots">${Array.from({length:5},(_,j)=>`<div class="skill-dot${j<5-Math.floor(i/2)?' filled':''}"></div>`).join('')}</div></div>`).join('')}`:''}
+      ${d.tools?`<div class="s-head" style="margin-top:1rem;">Tools</div><div class="cv-ci-s">${d.tools}</div>`:''}
+      ${certs.length?`<div class="s-head">Certifications</div>${certs.map(c=>`<div class="cv-ci-s">▸ ${c}</div>`).join('')}`:''}
+      ${d.langs?`<div class="s-head">Languages</div><div class="cv-ci-s">${d.langs}</div>`:''}
+      ${d.interests?`<div class="s-head">Interests</div><div class="cv-ci-s">${d.interests}</div>`:''}
+    </div>
+  </div>
+</div>`;
+}
+
+function cvT5(d, skills, certs) {
+  const expHTML = d.experiences && d.experiences.length
+    ? d.experiences.map(e=>`
+      <div class="cv-entry">
+        <div class="cv-et">${e.title}</div>
+        <div class="cv-es">${e.company}${e.loc?' · '+e.loc:''}</div>
+        <div class="cv-ed">${e.from}${e.to?' – '+e.to:''}</div>
+        <div class="cv-desc">${e.desc}</div>
+      </div>`).join('')
+    : '<div class="cv-desc" style="color:#aaa;">Add your experience in the Experience tab.</div>';
+
+  const eduHTML = d.education && d.education.length
+    ? d.education.map(e=>`
+      <div style="margin-bottom:.8rem;font-family:'Syne',sans-serif;font-size:.83rem;color:#333;line-height:1.5;">
+        <div style="font-weight:600;">${e.degree}</div>
+        <div style="color:#2D8C6B;">${e.school}</div>
+        ${e.grade?`<div style="color:#666;font-size:.78rem;">${e.grade}</div>`:''}
+        ${e.year?`<div style="color:#888;font-size:.75rem;">${e.year}</div>`:''}
+      </div>`).join('')
+    : '';
+
+  return `<div class="cv-t5">
+  <div class="cv-header">
+    <div>
+      <div class="cv-name">${d.name||'Your Name'}</div>
+      <div class="cv-title">${d.title||'Professional Title'}</div>
+    </div>
+    <div>
+      ${d.email?`<div class="cv-ci">${d.email}</div>`:''}
+      ${d.phone?`<div class="cv-ci">${d.phone}</div>`:''}
+      ${d.location?`<div class="cv-ci">${d.location}</div>`:''}
+      ${d.link?`<div class="cv-ci">${d.link}</div>`:''}
+    </div>
+  </div>
+  <div class="cv-body">
+    <div>
+      ${d.summary?`<div class="cv-sh">Profile</div><div class="cv-desc" style="margin-bottom:1.4rem;">${d.summary}</div>`:''}
+      <div class="cv-sh">Professional Experience</div>
+      ${expHTML}
+    </div>
+    <div>
+      ${eduHTML?`<div class="cv-sh">Education</div>${eduHTML}`:''}
+      ${skills.length?`<div class="cv-sh" style="margin-top:1.2rem;">Skills</div><div class="cv-skills">${skills.map(s=>`<span class="cv-skill">${s}</span>`).join('')}</div>`:''}
+      ${d.tools?`<div class="cv-sh" style="margin-top:1rem;">Tools</div><div class="cv-desc" style="font-size:.8rem;">${d.tools}</div>`:''}
+      ${d.langs?`<div class="cv-sh" style="margin-top:1rem;">Languages</div><div class="cv-desc" style="font-size:.82rem;">${d.langs}</div>`:''}
+      ${certs.length?`<div class="cv-sh" style="margin-top:1rem;">Certifications</div>${certs.map(c=>`<div class="cv-desc" style="font-size:.8rem;margin-bottom:.3rem;">▸ ${c}</div>`).join('')}`:''}
+      ${d.interests?`<div class="cv-sh" style="margin-top:1rem;">Interests</div><div class="cv-desc" style="font-size:.8rem;">${d.interests}</div>`:''}
+    </div>
+  </div>
+</div>`;
+}
+
+// ══════════════════════════════════════
+//  ACTIONS
+// ══════════════════════════════════════
+function selectDesign(n, el) {
+  document.querySelectorAll('.design-thumb').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  currentDesign = n;
+  renderCV();
+}
+
+function triggerAIDesign(el) {
+  document.querySelectorAll('.design-thumb').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const d = getFormData();
+  const target = (d.target + ' ' + d.title).toLowerCase();
+  if (/tech|engineer|developer|software|data|cyber/.test(target)) currentDesign = 2;
+  else if (/design|creative|art|ux|ui|media|brand/.test(target)) currentDesign = 3;
+  else if (/finance|banking|law|legal|audit|executive|cfo|ceo/.test(target)) currentDesign = 1;
+  else if (/manag|director|head|vp|president|operations/.test(target)) currentDesign = 4;
+  else if (/sustain|ngo|research|academic|professor|science|health/.test(target)) currentDesign = 5;
+  else currentDesign = Math.ceil(Math.random() * 5);
+  generateCV();
+}
+
+function switchTab(evt, id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  evt.target.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+function setZoom(z, btn) {
+  document.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentZoom = z;
+  const frame = document.getElementById('cv-frame');
+  frame.style.transform = `scale(${z})`;
+  frame.style.transformOrigin = 'top center';
+  frame.style.marginBottom = z < 1 ? `-${(1-z) * frame.offsetHeight * 0.5}px` : '0';
+}
+
+async function generateCV() {
+  const btn = document.getElementById('gen-btn');
+  const statusEl = document.getElementById('ai-status');
+  const statusText = document.getElementById('ai-status-text');
+  btn.disabled = true;
+  document.getElementById('gen-btn-text').textContent = '✦ Generating...';
+  statusEl.classList.add('visible');
+  for (let i = 0; i < statusMessages.length; i++) {
+    statusText.textContent = statusMessages[i];
+    await new Promise(r => setTimeout(r, 550));
+  }
+  renderCV();
+  statusEl.classList.remove('visible');
+  btn.disabled = false;
+  document.getElementById('gen-btn-text').textContent = '✦ Generate My CV';
+  document.querySelector('.cv-preview-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderCV() {
+  const frame = document.getElementById('cv-frame');
+  frame.style.opacity = '0';
+  setTimeout(() => {
+    frame.innerHTML = getCV(currentDesign);
+    frame.style.transition = 'opacity .4s ease';
+    frame.style.opacity = '1';
+    frame.style.transform = `scale(${currentZoom})`;
+    frame.style.transformOrigin = 'top center';
+  }, 180);
+}
+
+function applyTemplate(n) {
+  currentDesign = n;
+  document.querySelectorAll('.design-thumb').forEach(t => {
+    t.classList.toggle('active', parseInt(t.dataset.design) === n);
+  });
+  generateCV();
+  document.getElementById('builder').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ══════════════════════════════════════
+//  DOWNLOAD: PDF
+// ══════════════════════════════════════
+function downloadPDF() {
+  const content = document.getElementById('cv-frame').innerHTML;
+  const name = getFormData().name || 'CV';
+  const allStyles = Array.from(document.querySelectorAll('style')).map(s => s.innerText).join('\n');
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>${name} — CV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box;}
+      body{background:#fff;}
+      @media print{
+        @page{margin:0;size:A4;}
+        body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+        .cv-t2{min-height:297mm!important;}
+        .cv-t1,.cv-t3,.cv-t4,.cv-t5{min-height:297mm!important;}
+      }
+    </style>
+    <style>${allStyles}</style>
+    </head><body>${content}</body></html>`);
+  win.document.close();
+  setTimeout(() => { win.print(); }, 900);
+}
+
+// ══════════════════════════════════════
+//  DOWNLOAD: WORD (.doc)
+// ══════════════════════════════════════
+function downloadWord() {
+  const d = getFormData();
+  const skills = skillsArray(d.skills);
+  const certs = certsArray(d.certs);
+  const name = d.name || 'CV';
+
+  const expSection = d.experiences && d.experiences.length
+    ? d.experiences.map(e => `
+      <h3 style="margin:0;font-size:12pt;color:#1A1A1A;">${e.title}</h3>
+      <p style="margin:2px 0;font-size:10pt;color:#8B6914;font-weight:bold;">${e.company}${e.loc?' · '+e.loc:''}${e.from?' &nbsp;|&nbsp; '+e.from+(e.to?' – '+e.to:''):''}</p>
+      <p style="margin:4px 0 10px;font-size:10pt;color:#444;line-height:1.6;">${e.desc}</p>`).join('')
+    : '<p style="color:#aaa;font-size:10pt;">No experience added.</p>';
+
+  const eduSection = d.education && d.education.length
+    ? d.education.map(e => `
+      <p style="margin:2px 0;font-size:11pt;font-weight:bold;color:#1A1A1A;">${e.degree}</p>
+      <p style="margin:0 0 4px;font-size:10pt;color:#555;">${e.school}${e.grade?' — '+e.grade:''}${e.year?', '+e.year:''}</p>
+      ${e.notes?`<p style="margin:0 0 8px;font-size:9.5pt;color:#777;font-style:italic;">${e.notes}</p>`:''}`).join('')
+    : '';
+
+  const html = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta charset="utf-8">
+  <title>${name} — CV</title>
+  <!--[if gte mso 9]>
+  <xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml>
+  <![endif]-->
+  <style>
+    @page { size: A4; margin: 2cm 2.5cm; }
+    body { font-family: Calibri, sans-serif; font-size: 11pt; color: #1A1A1A; line-height: 1.5; }
+    h1 { font-size: 26pt; font-weight: 300; color: #1A1A1A; margin: 0 0 4px; letter-spacing: -0.5px; }
+    h2 { font-size: 8pt; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #8B6914; margin: 18px 0 6px; border-bottom: 1.5px solid #C9A84C; padding-bottom: 3px; }
+    h3 { font-size: 12pt; font-weight: 600; margin: 0; }
+    p { margin: 0; }
+    .header-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+    .header-table td { vertical-align: bottom; padding: 0; }
+    .header-table td:last-child { text-align: right; }
+    .contact { font-size: 9.5pt; color: #555; line-height: 1.9; }
+    .title-line { font-size: 10pt; letter-spacing: 2px; text-transform: uppercase; color: #8B6914; font-weight: 600; margin-top: 3px; }
+    .skill-pill { display: inline-block; border: 1px solid #C9A84C; color: #8B6914; padding: 2px 8px; font-size: 8.5pt; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 2px 3px 2px 0; }
+    .cert-item { font-size: 10pt; color: #444; margin-bottom: 3px; }
+    hr { border: none; border-top: 1px solid #E0D8C8; margin: 6px 0; }
+  </style>
+</head>
+<body>
+  <table class="header-table">
+    <tr>
+      <td>
+        <h1>${d.name||'Your Name'}</h1>
+        <div class="title-line">${d.title||''}</div>
+      </td>
+      <td class="contact">
+        ${d.email||''}<br>
+        ${d.phone||''}<br>
+        ${d.location||''}<br>
+        ${d.link||''}
+      </td>
+    </tr>
+  </table>
+  <hr>
+
+  ${d.summary?`<h2>Profile</h2><p style="font-size:10.5pt;color:#333;line-height:1.7;margin-bottom:6px;">${d.summary}</p>`:''}
+
+  <h2>Experience</h2>
+  ${expSection}
+
+  ${eduSection?`<h2>Education</h2>${eduSection}`:''}
+
+  ${skills.length?`<h2>Core Skills</h2><p>${skills.map(s=>`<span class="skill-pill">${s}</span>`).join('')}</p>`:''}
+
+  ${d.tools?`<h2>Tools &amp; Technologies</h2><p style="font-size:10pt;color:#444;">${d.tools}</p>`:''}
+
+  ${certs.length?`<h2>Certifications &amp; Awards</h2>${certs.map(c=>`<p class="cert-item">▸ ${c}</p>`).join('')}`:''}
+
+  ${d.langs?`<h2>Languages</h2><p style="font-size:10pt;color:#444;">${d.langs}</p>`:''}
+
+  ${d.interests?`<h2>Interests</h2><p style="font-size:10pt;color:#444;">${d.interests}</p>`:''}
+</body>
+</html>`;
+
+  const blob = new Blob(['\ufeff' + html], { type: 'application/msword;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${name.replace(/\s+/g,'_')}_CV.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ══════════════════════════════════════
+//  SHOWCASE PREVIEWS (sample data)
+// ══════════════════════════════════════
+function renderShowcasePreviews() {
+  const sample = {
+    name: 'Alexandra Chen', initials: 'AC',
+    title: 'Senior Product Designer',
+    email: 'a.chen@design.co', phone: '+44 7890 123456',
+    location: 'London, UK', link: 'linkedin.com/in/achen',
+    summary: 'Award-winning designer with 8+ years crafting digital experiences for Fortune 500 companies.',
+    skills: 'Figma, Design Systems, User Research, Prototyping',
+    tools: 'Adobe CC, Notion, Framer',
+    certs: 'Google UX Certificate\nAwwwards Site of the Year 2023',
+    langs: 'English (Native) · Mandarin · French',
+    interests: 'Photography, Open-source',
+    experiences: [
+      { title: 'Senior Product Designer', company: 'Monzo Bank', loc: 'London', from: '2021', to: 'Present', desc: 'Led redesign of the core banking app, increasing engagement by 34%.' },
+      { title: 'UX Designer', company: 'Revolut', loc: 'London', from: '2018', to: '2021', desc: 'Designed the crypto trading interface from concept to launch for 3M+ users.' }
+    ],
+    education: [
+      { degree: 'BA Graphic Design', school: 'Central Saint Martins', year: '2018', grade: 'First Class Honours', notes: '' }
+    ]
+  };
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById(`showcase-t${i}`);
+    if (el) el.innerHTML = getCV(i, sample);
+  }
+}
+
+// ══════════════════════════════════════
+//  SCROLL REVEAL
+// ══════════════════════════════════════
+function initReveal() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+}
+
+// ══════════════════════════════════════
+//  INIT — pre-populate with sample data
+// ══════════════════════════════════════
+window.addEventListener('load', () => {
+  // Pre-load two sample experiences
+  addExperience({ title: 'Senior Product Designer', company: 'Monzo Bank', loc: 'London, UK', from: 'Jan 2021', to: 'Present', desc: 'Led the complete redesign of the core banking application, increasing user engagement by 34% and reducing support tickets by 18%. Managed a team of 6 designers across 3 time zones.' });
+  addExperience({ title: 'UX Designer', company: 'Revolut', loc: 'London, UK', from: 'Mar 2018', to: 'Dec 2020', desc: 'Designed the cryptocurrency trading interface from concept to public launch, serving 3M+ users globally. Collaborated cross-functionally with engineering, compliance, and marketing.' });
+
+  // Pre-load one sample education
+  addEducation({ degree: 'BA Graphic Design', school: 'Central Saint Martins', year: '2018', grade: 'First Class Honours', notes: 'Dissertation: The psychology of colour in digital products' });
+
+  renderCV();
+  renderShowcasePreviews();
+  initReveal();
+});
+</script>
+</body>
+</html>
